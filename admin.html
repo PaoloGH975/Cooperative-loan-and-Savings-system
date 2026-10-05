@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoopCore Admin & Staff System</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ADMIN AUTH SCREEN -->
+  <div id="admin-auth-screen" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #ECFDF5; padding: 16px;">
+    <div class="card" style="max-width: 400px; width: 100%; border: 1px solid var(--admin-border-green); padding: 32px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-flex; padding: 12px; background: var(--admin-light); border-radius: 50%; color: var(--admin-green); margin-bottom: 10px;">
+          <i data-lucide="lock" style="width: 32px; height: 32px;"></i>
+        </div>
+        <h2 style="color: var(--admin-dark); font-size: 22px; font-weight: 800;">Cooperative Staff Login</h2>
+        <p style="color: var(--text-muted); font-size: 13px;">Enterprise Ledger & Credit Administration</p>
+      </div>
+      <form onsubmit="handleAdminLogin(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">Staff Email</label>
+          <input type="email" class="form-input" style="width: 100%;" value="admin@coopcore.ph" required>
+        </div>
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Enter password">
+
+          <button type="button" class="password-toggle" onclick="togglePassword()">
+              <i data-lucide="eye" id="password-eye"></i>
+          </button>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i data-lucide="key" class="icon"></i> Enter Admin Workstation
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN WORKSTATION APP -->
+  <div id="admin-app-screen" style="display: none; flex-direction: column; min-height: 100vh;">
+    <header class="top-bar">
+      <div class="brand">
+        <i data-lucide="building-2" style="color: var(--admin-green);"></i>
+        <span>CoopCore Enterprise</span>
+        <span class="badge-admin">Admin Workstation</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Officer: <strong>Maria Santos</strong></span>
+        <a href="member.html" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 10px;"><i data-lucide="external-link" class="icon"></i> Member Portal</a>
+        <button class="btn btn-outline" onclick="adminLogout()" style="font-size: 12px; padding: 6px 10px;"><i data-lucide="log-out" class="icon"></i> Logout</button>
+      </div>
+    </header>
+
+    <div class="admin-layout">
+      <!-- SIDEBAR -->
+      <aside class="admin-sidebar">
+        <ul class="admin-menu">
+          <li class="menu-item active" onclick="switchAdminTab('dashboard')"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard Overview</li>
+          <li class="menu-item" onclick="switchAdminTab('approvals')"><i data-lucide="user-check" class="icon"></i> Member Approvals</li>
+          <li class="menu-item" onclick="switchAdminTab('registry')"><i data-lucide="users" class="icon"></i> Member Registry</li>
+          <li class="menu-item" onclick="switchAdminTab('savings')"><i data-lucide="wallet" class="icon"></i> Savings Ledger</li>
+          <li class="menu-item" onclick="switchAdminTab('loans')"><i data-lucide="file-check" class="icon"></i> Loan Applications</li>
+          <li class="menu-item" onclick="switchAdminTab('repayments')"><i data-lucide="credit-card" class="icon"></i> Record Payment</li>
+        </ul>
+      </aside>
+
+      <!-- CONTENT PANE -->
+      <main class="admin-content">
+        <!-- 1. DASHBOARD OVERVIEW -->
+        <section id="admin-tab-dashboard" class="admin-pane">
+          <!-- COOPERATIVE MEMORANDUMS & ANNOUNCEMENTS -->
+          <div class="memo-card">
+            <div class="memo-title">
+              <i data-lucide="megaphone" style="color: var(--admin-green);"></i>
+              Cooperative Memorandums & Official Announcements (FY 2026)
+            </div>
+            <div style="font-size: 13px; color: var(--admin-dark); margin-top: 8px; line-height: 1.5;">
+              <strong>MEMO #2026-10:</strong> Annual General Assembly scheduled for November 15, 2026 at Calamba Convention Hall. 
+              All credit committee members must finalize dividend calculations and loan write-off recommendations by October 30.
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <div class="card">
+              <div class="stat-title">Active Members</div>
+              <div class="stat-val" id="stat-members-count">3</div>
+            </div>
+            <div class="card">
+              <div class="stat-title">Cooperative Savings Pool</div>
+              <div class="stat-val" style="color: var(--admin-green);" id="stat-total-savings">₱24,700.00</div>
+            </div>
+            <div class="card">
+              <div class="stat-title">Pending Loan Requests</div>
+              <div class="stat-val" style="color: var(--amber);" id="stat-pending-loans">1</div>
+            </div>
+            <div class="card">
+              <div class="stat-title">Total Outstanding Loans</div>
+              <div class="stat-val" style="color: var(--crimson);" id="stat-loan-portfolio">₱10,283.34</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--admin-dark); margin-bottom: 12px;">Recent General Ledger Postings</h3>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Ref Code</th>
+                    <th>Account Holder</th>
+                    <th>Activity Type</th>
+                    <th>Amount (₱)</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-dash-tx-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. MEMBER APPROVALS PAGE -->
+        <section id="admin-tab-approvals" class="admin-pane" style="display: none;">
+          <div class="card">
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--admin-dark); margin-bottom: 4px;">Pending Member Qualifications & Verification</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Review applicant documents and PMES seminar completion to grant cooperative membership.</p>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Applicant Name</th>
+                    <th>Contact Phone</th>
+                    <th>Civil & Employment Status</th>
+                    <th>PMES Completed?</th>
+                    <th>Initial Share Capital</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="approvals-table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. MEMBER REGISTRY (WITH VIEW ACCOUNT DETAILS) -->
+        <section id="admin-tab-registry" class="admin-pane" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <h2 style="font-size: 18px; font-weight: 800; color: var(--admin-dark);">Official Member Registry</h2>
+              <input type="text" class="form-input" placeholder="Search by name, ID, or account..." style="max-width: 280px;" onkeyup="filterMemberRegistry(this.value)">
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Member ID</th>
+                    <th>Account Number</th>
+                    <th>Full Name</th>
+                    <th>Savings Balance</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="registry-table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. SAVINGS LEDGER (WITH SEARCH BY NAME / ID) -->
+        <section id="admin-tab-savings" class="admin-pane" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <h2 style="font-size: 18px; font-weight: 800; color: var(--admin-dark);">Savings Ledger Book</h2>
+              <input type="text" class="form-input" id="savings-search-input" placeholder="Search Member Name or Member ID..." style="max-width: 320px;" onkeyup="filterSavingsLedger(this.value)">
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Transaction Reference</th>
+                    <th>Member ID</th>
+                    <th>Account Name</th>
+                    <th>Category</th>
+                    <th>Amount Credited</th>
+                    <th>Running Ledger Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="savings-ledger-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. LOAN APPLICATIONS (WITH SEARCH & VIEW ACCOUNT STATUS) -->
+        <section id="admin-tab-loans" class="admin-pane" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <h2 style="font-size: 18px; font-weight: 800; color: var(--admin-dark);">Credit Committee Loan Verification</h2>
+              <input type="text" class="form-input" placeholder="Search application reference..." style="max-width: 280px;" onkeyup="filterLoanApps(this.value)">
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>App Ref</th>
+                    <th>Applicant</th>
+                    <th>Requested Loan</th>
+                    <th>Term</th>
+                    <th>Purpose</th>
+                    <th>Account Standing</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="loans-review-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. RECORD PAYMENT (NON-INPUT AUDIT MODE) -->
+        <section id="admin-tab-repayments" class="admin-pane" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--admin-dark);">Payment Recording & Settlement Verification</h2>
+                <p style="font-size: 13px; color: var(--text-muted);">Non-input electronic audit trail. Search payment reference to verify transaction parameters.</p>
+              </div>
+              <input type="text" class="form-input" id="pay-search-ref" placeholder="Search Payment Reference (e.g. RCT-8841)..." style="max-width: 320px;" onkeyup="filterPaymentRecords(this.value)">
+            </div>
+
+            <!-- NON-INPUT AUDIT DISPLAY CONTAINER -->
+            <div id="payment-audit-display" style="display: none; background: #FFFFFF; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+              <h3 style="font-size: 15px; font-weight: 800; color: var(--admin-dark); margin-bottom: 14px;"><i data-lucide="file-text" class="icon"></i> Verified Payment Record Audit</h3>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Account Name</label>
+                  <div class="readonly-field" id="audit-name">-</div>
+                </div>
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Payment Reference Number</label>
+                  <div class="readonly-field" id="audit-ref">-</div>
+                </div>
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Bank / Account Number</label>
+                  <div class="readonly-field" id="audit-acc">-</div>
+                </div>
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Payment Received</label>
+                  <div class="readonly-field" style="color: var(--admin-green);" id="audit-received">-</div>
+                </div>
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Charges</label>
+                  <div class="readonly-field" id="audit-charges">₱0.00</div>
+                </div>
+                <div>
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Penalties</label>
+                  <div class="readonly-field" style="color: var(--crimson);" id="audit-penalties">₱0.00</div>
+                </div>
+                <div style="grid-column: span 3;">
+                  <label style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Remaining Loan Balance</label>
+                  <div class="readonly-field" style="font-size: 18px; font-weight: 800; color: var(--crimson);" id="audit-balance">-</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAYMENT TRANSACTION LOG TABLE -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Ref Number</th>
+                    <th>Member Name</th>
+                    <th>Bank Account Number</th>
+                    <th>Payment Received</th>
+                    <th>Charges</th>
+                    <th>Penalties</th>
+                    <th>Remaining Balance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="payment-ledger-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- VIEW ACCOUNT STATUS MODAL (FOR LOAN APPLICATION) -->
+  <div class="modal-overlay" id="account-status-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span style="color: var(--admin-dark);"><i data-lucide="user-check" class="icon"></i> Member Account Standing & Application Status</span>
+        <button onclick="closeModal('account-status-modal')" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="account-status-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- VIEW ACCOUNT DETAILS MODAL (FOR REGISTRY) -->
+  <div class="modal-overlay" id="account-details-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span style="color: var(--admin-dark);"><i data-lucide="credit-card" class="icon"></i> Member Profile & Comprehensive Account Details</span>
+        <button onclick="closeModal('account-details-modal')" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="account-details-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
