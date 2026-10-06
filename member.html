@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,16 @@
   <link rel="stylesheet" href="member.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
   <!-- AUTH SCREEN -->
-  <div id="auth-screen" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #ECFDF5; padding: 16px;">
+  <div id="auth-screen"
+    style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #ECFDF5; padding: 16px;">
     <div class="card" style="max-width: 420px; width: 100%; border: 1px solid var(--border-green); padding: 32px;">
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-flex; padding: 12px; background: var(--light-green); border-radius: 50%; color: var(--primary-green); margin-bottom: 10px;">
+        <div
+          style="display: inline-flex; padding: 12px; background: var(--light-green); border-radius: 50%; color: var(--primary-green); margin-bottom: 10px;">
           <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
         </div>
         <h2 style="color: var(--dark-green); font-size: 22px; font-weight: 800;">CoopCore Member Portal</h2>
@@ -21,96 +25,99 @@
       </div>
 
       <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-        <button id="auth-login-tab" class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="toggleAuthMode('login')">Sign In</button>
-        <button id="auth-reg-tab" class="btn btn-outline" style="flex: 1; justify-content: center;" onclick="toggleAuthMode('signup')">Sign Up</button>
+        <button id="auth-login-tab" class="btn btn-primary" style="flex: 1; justify-content: center;"
+          onclick="toggleAuthMode('login')">Sign In</button>
+        <button id="auth-reg-tab" class="btn btn-outline" style="flex: 1; justify-content: center;"
+          onclick="toggleAuthMode('signup')">Sign Up</button>
       </div>
 
       <form id="auth-form" onsubmit="handleAuthSubmit(event)">
 
-    <div id="reg-name-group" style="display: none;">
+        <div id="reg-name-group" style="display: none;">
 
-      <div class="form-group">
-        <label>First Name</label>
-        <input type="text" class="form-input" id="auth-first-name" placeholder="Elena">
-      </div>
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="form-input" id="auth-first-name" placeholder="Elena">
+          </div>
 
-      <div class="form-group">
-        <label>Middle Name</label>
-        <input type="text" class="form-input" id="auth-middle-name" placeholder="Maria">
-      </div>
+          <div class="form-group">
+            <label>Middle Name</label>
+            <input type="text" class="form-input" id="auth-middle-name" placeholder="Maria">
+          </div>
 
-      <div class="form-group">
-        <label>Last Name</label>
-        <input type="text" class="form-input" id="auth-last-name" placeholder="Rostova">
-      </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="form-input" id="auth-last-name" placeholder="Rostova">
+          </div>
 
-      <div class="form-group">
-        <label>Birthday</label>
-        <input type="date" class="form-input" id="auth-birthday">
-      </div>
+          <div class="form-group">
+            <label>Birthday</label>
+            <input type="date" class="form-input" id="auth-birthday">
+          </div>
 
-      <div class="form-group">
-        <label>Place of Birth</label>
-        <input type="text" class="form-input" id="auth-place-birth" placeholder="Cabuyao, Laguna">
-      </div>
+          <div class="form-group">
+            <label>Place of Birth</label>
+            <input type="text" class="form-input" id="auth-place-birth" placeholder="Cabuyao, Laguna">
+          </div>
 
-      <div class="form-group">
-        <label>Address</label>
-        <input type="text" class="form-input" id="auth-address" placeholder="Complete Address">
-      </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" class="form-input" id="auth-address" placeholder="Complete Address">
+          </div>
 
-      <div class="form-group">
-        <label>Occupation</label>
-        <input type="text" class="form-input" id="auth-occupation" placeholder="Employee">
-      </div>
+          <div class="form-group">
+            <label>Occupation</label>
+            <input type="text" class="form-input" id="auth-occupation" placeholder="Employee">
+          </div>
 
-      <div class="form-group">
-        <label>Gender</label>
-        <select class="form-input" id="auth-gender">
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select class="form-input" id="auth-gender">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
 
-      <div class="form-group">
-        <label>Nationality</label>
-        <input type="text" class="form-input" id="auth-nationality" placeholder="Filipino">
-      </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <input type="text" class="form-input" id="auth-nationality" placeholder="Filipino">
+          </div>
 
-      <div class="form-group">
-        <label>Monthly Income Range</label>
-        <select class="form-input" id="auth-income">
-          <option value="">Select Income Range</option>
-          <option value="Below 10000">Below ₱10,000</option>
-          <option value="10000-19999">₱10,000 - ₱19,999</option>
-          <option value="20000-29999">₱20,000 - ₱29,999</option>
-          <option value="30000-39999">₱30,000 - ₱39,999</option>
-          <option value="40000-49999">₱40,000 - ₱49,999</option>
-          <option value="50000-above">₱50,000 and above</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label>Monthly Income Range</label>
+            <select class="form-input" id="auth-income">
+              <option value="">Select Income Range</option>
+              <option value="Below 10000">Below ₱10,000</option>
+              <option value="10000-19999">₱10,000 - ₱19,999</option>
+              <option value="20000-29999">₱20,000 - ₱29,999</option>
+              <option value="30000-39999">₱30,000 - ₱39,999</option>
+              <option value="40000-49999">₱40,000 - ₱49,999</option>
+              <option value="50000-above">₱50,000 and above</option>
+            </select>
+          </div>
 
-  </div>
+        </div>
 
-  <div class="form-group">
-    <label>Registered Email</label>
-    <input type="text" class="form-input" id="auth-email" value="elena.rostova@coopmail.org" required>
-  </div>
+        <div class="form-group">
+          <label>Registered Email</label>
+          <input type="text" class="form-input" id="auth-email" value="elena.rostova@coopmail.org" required>
+        </div>
 
-  <div class="password-wrapper">
-    <input type="password" id="password" placeholder="Enter password">
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Enter password">
 
-    <button type="button" class="password-toggle" onclick="togglePassword()">
-        <i data-lucide="eye" id="password-eye"></i>
-    </button>
-</div>
+          <button type="button" class="password-toggle" onclick="togglePassword()">
+            <i data-lucide="eye" id="password-eye"></i>
+          </button>
+        </div>
 
-  <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" id="auth-submit-btn">
-    <i data-lucide="log-in" class="icon"></i> Login
-  </button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;"
+          id="auth-submit-btn">
+          <i data-lucide="log-in" class="icon"></i> Login
+        </button>
 
-</form>
+      </form>
     </div>
   </div>
 
@@ -118,81 +125,77 @@
   <div id="app-screen" style="display: none;">
     <nav class="sidebar">
 
-    <div class="sidebar-brand">
+      <div class="sidebar-brand">
         <div class="brand">
-            <i data-lucide="leaf"></i>
-            <span>CoopCore</span>
+          <i data-lucide="leaf"></i>
+          <span>CoopCore</span>
         </div>
         <span class="brand-badge">Member Portal</span>
-    </div>
+      </div>
 
-    <div class="sidebar-menu">
+      <div class="sidebar-menu">
 
-        <button class="sidebar-link active"
-                onclick="switchView('dashboard')">
-            <i data-lucide="layout-dashboard"></i>
-            <span>Dashboard</span>
+        <button class="sidebar-link active" onclick="switchView('dashboard')">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('deposit')">
-            <i data-lucide="arrow-down-circle"></i>
-            <span>Deposit</span>
+        <button class="sidebar-link" onclick="switchView('deposit')">
+          <i data-lucide="arrow-down-circle"></i>
+          <span>Deposit</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('transfer')">
-            <i data-lucide="arrow-up-right"></i>
-            <span>Transfer to Bank</span>
+        <button class="sidebar-link" onclick="switchView('transfer')">
+          <i data-lucide="arrow-up-right"></i>
+          <span>Transfer to Bank</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('repayment')">
-            <i data-lucide="receipt"></i>
-            <span>Loan Repayment</span>
+        <button class="sidebar-link" onclick="switchView('repayment')">
+          <i data-lucide="receipt"></i>
+          <span>Loan Repayment</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('apply-loan')">
-            <i data-lucide="file-plus"></i>
-            <span>Apply Loan</span>
+        <button class="sidebar-link" onclick="switchView('apply-loan')">
+          <i data-lucide="file-plus"></i>
+          <span>Apply Loan</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('transactions')">
-            <i data-lucide="history"></i>
-            <span>Search Transactions</span>
+        <button class="sidebar-link" onclick="switchView('transactions')">
+          <i data-lucide="history"></i>
+          <span>Search Transactions</span>
         </button>
 
-        <button class="sidebar-link"
-                onclick="switchView('profile')">
-            <i data-lucide="user"></i>
-            <span>Profile</span>
+        <button class="sidebar-link" onclick="switchView('profile')">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
         </button>
 
         <div class="sidebar-bottom">
-        <button class="sidebar-link logout-link" onclick="logout()">
+          <button class="sidebar-link logout-link" onclick="logout()">
             <i data-lucide="log-out"></i>
             <span>Log Out</span>
-        </button>
-    </div>
+          </button>
+        </div>
 
-    </div>
+      </div>
 
-    
 
-</nav>
-    
+
+    </nav>
+
     <div class="container">
       <!-- 1. DASHBOARD VIEW -->
       <section id="view-dashboard" class="page-pane">
         <!-- Balance and Account Details Header -->
-        <div class="card" style="background: linear-gradient(135deg, #064E3B 0%, #059669 100%); color: #FFFFFF; border: none;">
+        <div class="card"
+          style="background: linear-gradient(135deg, #064E3B 0%, #059669 100%); color: #FFFFFF; border: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             <div>
-              <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #A7F3D0;">Registered Member Account</span>
+              <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #A7F3D0;">Registered
+                Member Account</span>
               <h2 style="font-size: 24px; font-weight: 800;" id="user-display-name">Elena Rostova</h2>
-              <p style="font-size: 13px; color: #D1FAE5; margin-top: 2px;">Account Number: <strong id="user-display-acc">COOP-2024-884102</strong></p>
+              <p style="font-size: 13px; color: #D1FAE5; margin-top: 2px;">Account Number: <strong
+                  id="user-display-acc">COOP-2024-884102</strong></p>
             </div>
             <div style="text-align: right;">
               <span style="font-size: 12px; color: #A7F3D0;">Available Withdrawable Savings</span>
@@ -214,15 +217,16 @@
           </div>
           <div class="card metric-box">
             <div class="metric-title">Credit Standing</div>
-            <div class="metric-val" style="color: var(--primary-green);">Tier A (Prime)</div>
-            <span style="font-size: 12px; color: var(--primary-green);">Active</span>
+            <div class="metric-val" style="color: var(--primary-green);" id="user-credit-standing">Tier A (Prime)</div>
+            <span style="font-size: 12px; color: var(--primary-green);" id="user-account-standing">Active</span>
           </div>
         </div>
 
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <h3 style="font-size: 16px; font-weight: 700; color: var(--dark-green);">Recent Account Activities</h3>
-            <button class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="switchView('transactions')">View All</button>
+            <button class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;"
+              onclick="switchView('transactions')">View All</button>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -244,19 +248,25 @@
       <!-- 2. DEPOSIT PAGE -->
       <section id="view-deposit" class="page-pane" style="display: none;">
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i data-lucide="arrow-down-circle" class="icon"></i> Deposit to Savings Account</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Fund your cooperative savings or share capital via partner payment channels.</p>
-          
-          <div style="background: var(--light-green); border: 1px solid var(--border-green); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i
+              data-lucide="arrow-down-circle" class="icon"></i> Deposit to Savings Account</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Fund your cooperative savings or
+            share capital via partner payment channels.</p>
+
+          <div
+            style="background: var(--light-green); border: 1px solid var(--border-green); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
             <div style="font-size: 12px; color: var(--dark-green); font-weight: 600;">Recipient Account:</div>
-            <div style="font-size: 14px; font-weight: 700; color: var(--dark-green);">Elena Rostova &bull; COOP-2024-884102</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--dark-green);" id="deposit-recipient-label">Elena
+              Rostova &bull; COOP-2024-884102</div>
           </div>
 
           <form onsubmit="handleDepositSubmit(event)">
             <div class="form-group">
               <label>Deposit Target Bucket</label>
               <select class="form-input" id="dep-type">
-                <option value="Compulsory Savings">Regular Compulsory Savings</option>
+                <option value="Compulsory Monthly Savings">Regular Compulsory Savings</option>
+                <option value="Share Capital Contribution">Share Capital Contribution</option>
+                <option value="Fixed High-Yield Savings">Fixed High-Yield Savings</option>
               </select>
             </div>
             <div class="form-group">
@@ -265,14 +275,15 @@
             </div>
             <div class="form-group">
               <label>Funding Payment Channel</label>
-              <select class="form-input">
-                <option>GCash Online Cash-in</option>
-                <option>Maya Direct Checkout</option>
-                <option>BDO / BPI Bank Transfer</option>
-                <option>Over-the-Counter Co-op Teller</option>
+              <select class="form-input" id="dep-channel">
+                <option value="GCash Online Cash-in">GCash Online Cash-in</option>
+                <option value="Maya Direct Checkout">Maya Direct Checkout</option>
+                <option value="BDO / BPI Bank Transfer">BDO / BPI Bank Transfer</option>
+                <option value="Over-the-Counter Co-op Teller">Over-the-Counter Co-op Teller</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Confirm & Generate Deposit Reference</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Confirm &
+              Generate Deposit Reference</button>
           </form>
         </div>
       </section>
@@ -280,17 +291,20 @@
       <!-- 3. TRANSFER TO BANK ACCOUNT PAGE -->
       <section id="view-transfer" class="page-pane" style="display: none;">
         <div class="card" style="max-width: 600px; margin: 0 auto;">
-          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i data-lucide="arrow-up-right" class="icon"></i> Transfer Funds to Philippine Bank</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Withdraw directly from your co-op savings to external bank accounts via InstaPay.</p>
-          
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i
+              data-lucide="arrow-up-right" class="icon"></i> Transfer Funds to Philippine Bank</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Withdraw directly from your co-op
+            savings to external bank accounts via InstaPay.</p>
+
           <form onsubmit="handleBankTransfer(event)">
             <div class="form-group">
               <label>Source Account</label>
-              <input type="text" class="form-input" value="Coop Savings (Available: ₱8,500.00)" disabled>
+              <input type="text" class="form-input" id="transfer-source-input"
+                value="Coop Savings (Available: ₱8,500.00)" disabled>
             </div>
             <div class="form-group">
               <label>Select Destination Bank</label>
-              <select class="form-input" required>
+              <select class="form-input" id="transfer-bank" required>
                 <option value="BDO">BDO Unibank</option>
                 <option value="BPI">Bank of the Philippine Islands (BPI)</option>
                 <option value="Metrobank">Metrobank</option>
@@ -300,18 +314,21 @@
             </div>
             <div class="form-group">
               <label>Recipient Bank Account Number</label>
-              <input type="text" class="form-input" placeholder="e.g. 1093 4812 9912" required>
+              <input type="text" class="form-input" id="transfer-acc-num" placeholder="e.g. 1093 4812 9912" required>
             </div>
             <div class="form-group">
               <label>Account Holder Full Name</label>
-              <input type="text" class="form-input" placeholder="Must match bank registration" required>
+              <input type="text" class="form-input" id="transfer-acc-name" placeholder="Must match bank registration"
+                required>
             </div>
             <div class="form-group">
               <label>Transfer Amount (₱)</label>
-              <input type="number" min="200" max="8500" class="form-input" id="transfer-amount" placeholder="0.00" required>
+              <input type="number" min="200" max="8500" class="form-input" id="transfer-amount" placeholder="0.00"
+                required>
               <span style="font-size: 11px; color: var(--text-muted);">InstaPay transfer fee: ₱15.00</span>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Transfer Savings</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Transfer
+              Savings</button>
           </form>
         </div>
       </section>
@@ -319,13 +336,16 @@
       <!-- 4. LOAN REPAYMENT PAGE -->
       <section id="view-repayment" class="page-pane" style="display: none;">
         <div class="card" style="max-width: 650px; margin: 0 auto;">
-          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i data-lucide="receipt" class="icon"></i> Loan Repayment Portal</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Settle your monthly amortization directly using your savings or external bank channel.</p>
-          
-          <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 6px;"><i
+              data-lucide="receipt" class="icon"></i> Loan Repayment Portal</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Settle your monthly amortization
+            directly using your savings or external bank channel.</p>
+
+          <div
+            style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span style="font-size: 13px; color: var(--text-muted);">Active Loan Reference:</span>
-              <strong style="color: var(--dark-green);">LN-2024-089</strong>
+              <strong style="color: var(--dark-green);" id="repay-loan-ref">LN-2024-089</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span style="font-size: 13px; color: var(--text-muted);">Total Outstanding Loan:</span>
@@ -333,7 +353,7 @@
             </div>
             <div style="display: flex; justify-content: space-between;">
               <span style="font-size: 13px; color: var(--text-muted);">Standard Monthly Due:</span>
-              <strong style="color: var(--primary-green);">₱883.33</strong>
+              <strong style="color: var(--primary-green);" id="repay-monthly-due">₱883.33</strong>
             </div>
           </div>
 
@@ -350,7 +370,8 @@
               <label>Repayment Amount (₱)</label>
               <input type="number" min="100" step="0.01" class="form-input" id="repay-amount">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Loan Payment</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Loan
+              Payment</button>
           </form>
         </div>
       </section>
@@ -358,21 +379,27 @@
       <!-- 5. APPLY FOR LOAN (WITH TERMS & ₱6,000 THRESHOLD) -->
       <section id="view-apply-loan" class="page-pane" style="display: none;">
         <div class="card" style="max-width: 680px; margin: 0 auto;">
-          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 4px;"><i data-lucide="file-plus" class="icon"></i> Loan Application & Pre-qualification</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Submit your loan request for Credit Committee review.</p>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green); margin-bottom: 4px;"><i
+              data-lucide="file-plus" class="icon"></i> Loan Application & Pre-qualification</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Submit your loan request for Credit
+            Committee review.</p>
 
           <!-- Cooperative Balance Pre-Check Alert -->
-          <div style="background: var(--light-green); border: 1px solid var(--border-green); border-radius: 8px; padding: 14px; margin-bottom: 18px; display: flex; gap: 12px; align-items: center;">
-            <i data-lucide="check-circle" style="color: var(--primary-green); width: 28px; height: 28px; flex-shrink: 0;"></i>
-            <div style="font-size: 13px; color: var(--dark-green);">
-              <strong>Savings Threshold Met:</strong> You currently have <strong id="userSavingsBal">₱8,500.00</strong> in verified savings, which exceeds the mandatory <strong>₱6,000.00 minimum qualification threshold</strong>.
+          <div id="loan-threshold-container"
+            style="background: var(--light-green); border: 1px solid var(--border-green); border-radius: 8px; padding: 14px; margin-bottom: 18px; display: flex; gap: 12px; align-items: center;">
+            <i data-lucide="check-circle" id="loan-threshold-icon"
+              style="color: var(--primary-green); width: 28px; height: 28px; flex-shrink: 0;"></i>
+            <div style="font-size: 13px; color: var(--dark-green);" id="loan-threshold-text">
+              <strong>Savings Threshold Met:</strong> You currently have <strong id="userSavingsBal">₱8,500.00</strong>
+              in verified savings, which exceeds the mandatory <strong>₱6,000.00 minimum qualification
+                threshold</strong>.
             </div>
           </div>
 
           <form onsubmit="handleLoanApplication(event)">
             <div class="form-group">
               <label>Select Loan Package</label>
-              <select class="form-input" id="apply-type">
+              <select class="form-input" id="apply-type" onchange="calcLoanQuote()">
                 <option value="Regular Productive">Regular Productive Loan (6% p.a.)</option>
                 <option value="Emergency Assistance">Emergency Calamity Loan (3% p.a.)</option>
                 <option value="Micro-Enterprise">Micro-Enterprise Growth Facility (5% p.a.)</option>
@@ -380,7 +407,8 @@
             </div>
             <div class="form-group">
               <label>Requested Principal Amount (₱)</label>
-              <input type="number" class="form-input" id="apply-amount" min="1000" placeholder="e.g. 15000" oninput="calcLoanQuote()" required>
+              <input type="number" class="form-input" id="apply-amount" min="1000" placeholder="e.g. 15000"
+                oninput="calcLoanQuote()" required>
             </div>
             <div class="form-group">
               <label>Repayment Term (Months)</label>
@@ -391,136 +419,170 @@
               </select>
             </div>
 
-            <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+            <div
+              style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
               <span style="font-size: 12px; color: var(--text-muted);">Estimated Monthly Payment:</span>
-              <div id="apply-quote" style="font-size: 22px; font-weight: 800; color: var(--dark-green); margin-top: 2px;">₱0.00 / month</div>
+              <div id="apply-quote"
+                style="font-size: 22px; font-weight: 800; color: var(--dark-green); margin-top: 2px;">₱0.00 / month
+              </div>
             </div>
 
             <div class="form-group">
               <label>Specific Loan Purpose</label>
-              <textarea class="form-input" rows="2" placeholder="Explain the productive use of requested funds..." required></textarea>
+              <textarea class="form-input" id="apply-purpose" rows="2"
+                placeholder="Explain the productive use of requested funds..." required></textarea>
             </div>
 
             <!-- MANDATORY TERMS & CONDITIONS -->
-            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; background: #FFFFFF;">
-              <h4 style="font-size: 13px; font-weight: 700; color: var(--dark-green); margin-bottom: 8px;">Cooperative Loan Terms & Undertakings</h4>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-left: 18px; margin-bottom: 12px;">
+            <div
+              style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; background: #FFFFFF;">
+              <h4 style="font-size: 13px; font-weight: 700; color: var(--dark-green); margin-bottom: 8px;">Cooperative
+                Loan Terms & Undertakings</h4>
+              <ul
+                style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-left: 18px; margin-bottom: 12px;">
                 <h3>1. Membership and Eligibility</h3>
-                  <ul>
-                      <li>Membership is subject to the qualifications, requirements, and approval procedures established by the Cooperative and its approved bylaws.</li>
-                      <li>Applicants must provide complete, accurate, and truthful information and submit all required documents.</li>
-                      <li>Applicants must complete the required Pre-Membership Education Seminar (PMES), when applicable.</li>
-                  </ul>
+                <ul>
+                  <li>Membership is subject to the qualifications, requirements, and approval procedures established by
+                    the Cooperative and its approved bylaws.</li>
+                  <li>Applicants must provide complete, accurate, and truthful information and submit all required
+                    documents.</li>
+                  <li>Applicants must complete the required Pre-Membership Education Seminar (PMES), when applicable.
+                  </li>
+                </ul>
 
-                  <h3>2. Member Responsibilities</h3>
-                  <ul>
-                      <li>Members must keep their personal information and contact details accurate and updated.</li>
-                      <li>Members must protect their account credentials, passwords, and confidential information.</li>
-                      <li>Members must comply with the Cooperative's policies, bylaws, rules, and lawful decisions.</li>
-                  </ul>
+                <h3>2. Member Responsibilities</h3>
+                <ul>
+                  <li>Members must keep their personal information and contact details accurate and updated.</li>
+                  <li>Members must protect their account credentials, passwords, and confidential information.</li>
+                  <li>Members must comply with the Cooperative's policies, bylaws, rules, and lawful decisions.</li>
+                </ul>
 
-                  <h3>3. Share Capital and Savings</h3>
-                  <ul>
-                      <li>Share Capital represents the member's ownership interest in the Cooperative.</li>
-                      <li>Share Capital is not treated as ordinary withdrawable savings and may be subject to applicable restrictions.</li>
-                      <li>Members must maintain the required share capital and savings contributions according to Cooperative policies.</li>
-                  </ul>
+                <h3>3. Share Capital and Savings</h3>
+                <ul>
+                  <li>Share Capital represents the member's ownership interest in the Cooperative.</li>
+                  <li>Share Capital is not treated as ordinary withdrawable savings and may be subject to applicable
+                    restrictions.</li>
+                  <li>Members must maintain the required share capital and savings contributions according to
+                    Cooperative policies.</li>
+                </ul>
 
-                  <h3>4. Loan Application and Approval</h3>
-                  <ul>
-                      <li>All loan applications are subject to evaluation, verification, credit assessment, and approval.</li>
-                      <li>Submission of a loan application does not guarantee approval or disbursement.</li>
-                      <li>Additional documents or requirements may be requested depending on the loan.</li>
-                      <li>Applicant must strictly maintain a <strong>minimum of ₱6,000.00</strong> in non-withdrawable Share Capital during the tenure of the loan.</li>
-                      <li>Loans are subject to a <strong>1% Cooperative processing fee</strong> and <strong>credit life insurance deduction</strong> upon approval.</li>
-                  </ul>
+                <h3>4. Loan Application and Approval</h3>
+                <ul>
+                  <li>All loan applications are subject to evaluation, verification, credit assessment, and approval.
+                  </li>
+                  <li>Submission of a loan application does not guarantee approval or disbursement.</li>
+                  <li>Additional documents or requirements may be requested depending on the loan.</li>
+                  <li>Applicant must strictly maintain a <strong>minimum of ₱6,000.00</strong> in non-withdrawable Share
+                    Capital during the tenure of the loan.</li>
+                  <li>Loans are subject to a <strong>1% Cooperative processing fee</strong> and <strong>credit life
+                      insurance deduction</strong> upon approval.</li>
+                </ul>
 
-                  <h3>5. Loan Repayment and Delinquency</h3>
-                  <ul>
-                      <li>Members must pay their loan installments according to the approved repayment schedule.</li>
-                      <li>Payments must be made on or before the applicable due date.</li>
-                      <li>Delinquent installments incur a <strong>2% penalty surcharge per month</strong> after <strong>30 days past due</strong>, subject to applicable policies and laws.</li>
-                      <li>Continued failure to pay may result in collection actions and other lawful remedies.</li>
-                  </ul>
+                <h3>5. Loan Repayment and Delinquency</h3>
+                <ul>
+                  <li>Members must pay their loan installments according to the approved repayment schedule.</li>
+                  <li>Payments must be made on or before the applicable due date.</li>
+                  <li>Delinquent installments incur a <strong>2% penalty surcharge per month</strong> after <strong>30
+                      days past due</strong>, subject to applicable policies and laws.</li>
+                  <li>Continued failure to pay may result in collection actions and other lawful remedies.</li>
+                </ul>
 
-                  <h3>6. Loan Charges and Deductions</h3>
-                  <ul>
-                      <li>Applicable fees and deductions may be deducted from the approved loan proceeds before disbursement.</li>
-                      <li>These may include the <strong>1% processing fee</strong> and credit life insurance premiums or deductions.</li>
-                      <li>The member shall be informed of applicable deductions and net loan proceeds.</li>
-                  </ul>
+                <h3>6. Loan Charges and Deductions</h3>
+                <ul>
+                  <li>Applicable fees and deductions may be deducted from the approved loan proceeds before
+                    disbursement.</li>
+                  <li>These may include the <strong>1% processing fee</strong> and credit life insurance premiums or
+                    deductions.</li>
+                  <li>The member shall be informed of applicable deductions and net loan proceeds.</li>
+                </ul>
 
-                  <h3>7. Account Status</h3>
-                  <ul>
-                      <li>A member's account may be classified as Active, Inactive, Suspended, or Delinquent according to Cooperative policies.</li>
-                      <li>Inactive or suspended accounts may have limited access to certain services.</li>
-                  </ul>
+                <h3>7. Account Status</h3>
+                <ul>
+                  <li>A member's account may be classified as Active, Inactive, Suspended, or Delinquent according to
+                    Cooperative policies.</li>
+                  <li>Inactive or suspended accounts may have limited access to certain services.</li>
+                </ul>
 
-                  <h3>8. Transparency and Financial Information</h3>
-                  <ul>
-                      <li>The Cooperative shall strive to maintain transparency regarding applicable fees, loan terms, account balances, and payment schedules.</li>
-                      <li>Members may request access to records or information as permitted by law, bylaws, and Cooperative policies.</li>
-                  </ul>
+                <h3>8. Transparency and Financial Information</h3>
+                <ul>
+                  <li>The Cooperative shall strive to maintain transparency regarding applicable fees, loan terms,
+                    account balances, and payment schedules.</li>
+                  <li>Members may request access to records or information as permitted by law, bylaws, and Cooperative
+                    policies.</li>
+                </ul>
 
-                  <h3>9. Privacy and Personal Information</h3>
-                  <ul>
-                      <li>The Cooperative may collect and process personal information for legitimate Cooperative purposes.</li>
-                      <li>Personal information shall be handled in accordance with applicable Philippine data privacy laws.</li>
-                      <li>Members should report suspected unauthorized access or misuse of their personal information.</li>
-                  </ul>
+                <h3>9. Privacy and Personal Information</h3>
+                <ul>
+                  <li>The Cooperative may collect and process personal information for legitimate Cooperative purposes.
+                  </li>
+                  <li>Personal information shall be handled in accordance with applicable Philippine data privacy laws.
+                  </li>
+                  <li>Members should report suspected unauthorized access or misuse of their personal information.</li>
+                </ul>
 
-                  <h3>10. Fraud and Unauthorized Transactions</h3>
-                  <ul>
-                      <li>Providing false, misleading, altered, or fraudulent information or documents is prohibited.</li>
-                      <li>Unauthorized use of another member's account, identity, or credentials is prohibited.</li>
-                      <li>Confirmed violations may result in disciplinary measures, recovery of losses, and/or appropriate legal action.</li>
-                  </ul>
+                <h3>10. Fraud and Unauthorized Transactions</h3>
+                <ul>
+                  <li>Providing false, misleading, altered, or fraudulent information or documents is prohibited.</li>
+                  <li>Unauthorized use of another member's account, identity, or credentials is prohibited.</li>
+                  <li>Confirmed violations may result in disciplinary measures, recovery of losses, and/or appropriate
+                    legal action.</li>
+                </ul>
 
-                  <h3>11. Violations and Disciplinary Action</h3>
-                  <ul>
-                      <li>Members who violate Cooperative rules, bylaws, agreements, or applicable laws may be subject to disciplinary action.</li>
-                      <li>Actions may include written notice, suspension of privileges, account restrictions, or termination where legally permitted.</li>
-                      <li>Members shall be given applicable notice and an opportunity to respond when required.</li>
-                  </ul>
+                <h3>11. Violations and Disciplinary Action</h3>
+                <ul>
+                  <li>Members who violate Cooperative rules, bylaws, agreements, or applicable laws may be subject to
+                    disciplinary action.</li>
+                  <li>Actions may include written notice, suspension of privileges, account restrictions, or termination
+                    where legally permitted.</li>
+                  <li>Members shall be given applicable notice and an opportunity to respond when required.</li>
+                </ul>
 
-                  <h3>12. Legal Action and Collection</h3>
-                  <ul>
-                      <li>If a member fails to fulfill a financial obligation, the Cooperative may pursue lawful remedies to recover the outstanding obligation.</li>
-                      <li>Remedies may include collection procedures, demand letters, settlement arrangements, or legal proceedings when appropriate.</li>
-                      <li>Legal action shall be undertaken in accordance with applicable laws, agreements, and Cooperative bylaws.</li>
-                  </ul>
+                <h3>12. Legal Action and Collection</h3>
+                <ul>
+                  <li>If a member fails to fulfill a financial obligation, the Cooperative may pursue lawful remedies to
+                    recover the outstanding obligation.</li>
+                  <li>Remedies may include collection procedures, demand letters, settlement arrangements, or legal
+                    proceedings when appropriate.</li>
+                  <li>Legal action shall be undertaken in accordance with applicable laws, agreements, and Cooperative
+                    bylaws.</li>
+                </ul>
 
-                  <h3>13. Complaints and Appeals</h3>
-                  <ul>
-                      <li>Members may submit complaints or concerns through the Cooperative's designated grievance procedure.</li>
-                      <li>Complaints shall be handled according to Cooperative policies, bylaws, and applicable laws.</li>
-                  </ul>
+                <h3>13. Complaints and Appeals</h3>
+                <ul>
+                  <li>Members may submit complaints or concerns through the Cooperative's designated grievance
+                    procedure.</li>
+                  <li>Complaints shall be handled according to Cooperative policies, bylaws, and applicable laws.</li>
+                </ul>
 
-                  <h3>14. Amendments</h3>
-                  <ul>
-                      <li>The Cooperative may update these Terms when necessary to reflect changes in policies, regulations, or applicable laws.</li>
-                      <li>Material changes shall be communicated to members through appropriate channels when required.</li>
-                  </ul>
+                <h3>14. Amendments</h3>
+                <ul>
+                  <li>The Cooperative may update these Terms when necessary to reflect changes in policies, regulations,
+                    or applicable laws.</li>
+                  <li>Material changes shall be communicated to members through appropriate channels when required.</li>
+                </ul>
 
-                  <h3>15. Governing Law</h3>
-                  <p>
-                      These Terms and Agreement shall be interpreted and implemented in accordance
-                      with applicable laws of the Republic of the Philippines and the Cooperative's
-                      approved bylaws and policies.
-                  </p>
+                <h3>15. Governing Law</h3>
+                <p>
+                  These Terms and Agreement shall be interpreted and implemented in accordance
+                  with applicable laws of the Republic of the Philippines and the Cooperative's
+                  approved bylaws and policies.
+                </p>
 
-                  <h3>16. Member Acknowledgment</h3>
-                  <p>
-                      By checking the box below, I confirm that I have read, understood, and
-                      agree to comply with the Cooperative Terms and Agreement.
-                  </p>
-                        </ul>
-              <label style="display: flex; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--text-main); cursor: pointer;">
-                <input type="checkbox" id="terms-agree" required> I agree to the Cooperative Terms, Bylaws, and Undertakings.
+                <h3>16. Member Acknowledgment</h3>
+                <p>
+                  By checking the box below, I confirm that I have read, understood, and
+                  agree to comply with the Cooperative Terms and Agreement.
+                </p>
+              </ul>
+              <label
+                style="display: flex; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--text-main); cursor: pointer;">
+                <input type="checkbox" id="terms-agree" required> I agree to the Cooperative Terms, Bylaws, and
+                Undertakings.
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Loan Application</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Submit Loan
+              Application</button>
           </form>
         </div>
       </section>
@@ -528,9 +590,22 @@
       <!-- 6. TRANSACTIONS PAGE (WITH VIEW DETAILS MODAL) -->
       <section id="view-transactions" class="page-pane" style="display: none;">
         <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-            <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green);"><i data-lucide="history" class="icon"></i> Account Transaction History</h2>
-            <input type="text" class="form-input" placeholder="Search reference or type..." style="max-width: 260px;" onkeyup="filterTx(this.value)">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--dark-green);"><i data-lucide="history"
+                class="icon"></i> Account Transaction History</h2>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <input type="text" class="form-input" id="tx-search-input"
+                placeholder="Search reference, type, or notes..." style="max-width: 240px;" onkeyup="filterTx()">
+              <select class="form-input" id="tx-filter-type" style="max-width: 180px;" onchange="filterTx()">
+                <option value="ALL">All Activity Types</option>
+                <option value="Savings Deposit">Savings Deposit</option>
+                <option value="Bank Withdrawal">Bank Transfer Out</option>
+                <option value="Loan Repayment">Loan Repayment</option>
+                <option value="Loan Disbursal">Loan Disbursal</option>
+                <option value="Share Capital">Share Capital</option>
+              </select>
+            </div>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -553,115 +628,138 @@
       <!-- 7. PROFILE PAGE (WITH CREDIT TIER) -->
       <section id="view-profile" class="page-pane" style="display: none;">
         <div class="card" style="max-width: 700px; margin: 0 auto;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
             <div>
-              <h2 style="font-size: 20px; font-weight: 800; color: var(--dark-green);">Member Identification & Status</h2>
+              <h2 style="font-size: 20px; font-weight: 800; color: var(--dark-green);">Member Identification & Status
+              </h2>
               <p style="font-size: 13px; color: var(--text-muted);">Calamba Multi-Purpose Cooperative Registry</p>
             </div>
-            <!-- CREDIT TIER BADGE -->
-            <div style="background: var(--light-green); border: 2px solid var(--primary-green); padding: 8px 16px; border-radius: 10px; text-align: center;">
-              <div style="font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase;">Assigned Credit Tier</div>
-              <div style="font-size: 18px; font-weight: 800; color: var(--primary-green);">Tier A (Prime Member)</div>
-              <span style="font-size: 11px; color: var(--text-muted);">Max Credit: ₱150,000</span>
+            <!-- CREDIT TIER & ACCOUNT STATUS BADGES -->
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <div
+                style="background: var(--light-green); border: 2px solid var(--primary-green); padding: 8px 16px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase;">
+                  Assigned Credit Tier</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--primary-green);" id="prof-tier-badge">Tier A
+                  (Prime Member)</div>
+                <span style="font-size: 11px; color: var(--text-muted);" id="prof-tier-limit">Max Credit:
+                  ₱150,000</span>
+              </div>
+              <div id="prof-status-box"
+                style="background: var(--light-green); border: 2px solid var(--border-green); padding: 8px 16px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase;">
+                  Account Status</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--primary-green);" id="prof-status-badge">
+                  ACTIVE</div>
+                <span style="font-size: 11px; color: var(--text-muted);" id="prof-status-sub">Database Verified</span>
+              </div>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
 
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" class="form-input" value="Elena" readonly>
-          </div>
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" class="form-input" id="prof-first-name" value="Elena" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Middle Name</label>
-            <input type="text" class="form-input" value="Maria" readonly>
-          </div>
+            <div class="form-group">
+              <label>Middle Name</label>
+              <input type="text" class="form-input" id="prof-middle-name" value="Maria" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" class="form-input" value="Rostova" readonly>
-          </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" class="form-input" id="prof-last-name" value="Rostova" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Member Account Number</label>
-            <input type="text" class="form-input" value="COOP-2024-884102" readonly>
-          </div>
+            <div class="form-group">
+              <label>Member Account Number</label>
+              <input type="text" class="form-input" id="prof-account-number" value="COOP-2024-884102" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Birthday</label>
-            <input type="date" class="form-input" value="1998-05-15" readonly>
-          </div>
+            <div class="form-group">
+              <label>Birthday</label>
+              <input type="date" class="form-input" id="prof-birthday" value="1998-05-15" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Place of Birth</label>
-            <input type="text" class="form-input" value="Cabuyao, Laguna" readonly>
-          </div>
+            <div class="form-group">
+              <label>Place of Birth</label>
+              <input type="text" class="form-input" id="prof-birthplace" value="Cabuyao, Laguna" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Contact Number</label>
-            <input type="text" class="form-input" value="+63 917 123 4567">
-          </div>
+            <div class="form-group">
+              <label>Contact Number</label>
+              <input type="text" class="form-input" id="prof-phone" value="+63 917 123 4567">
+            </div>
 
-          <div class="form-group">
-            <label>Official Email</label>
-            <input type="text" class="form-input" value="elena.rostova@gmail.com" readonly>
-          </div>
+            <div class="form-group">
+              <label>Official Email</label>
+              <input type="text" class="form-input" id="prof-email" value="elena.rostova@gmail.com" readonly>
+            </div>
 
-          <div class="form-group">
-            <label>Occupation</label>
-            <input type="text" class="form-input" value="Employee">
-          </div>
+            <div class="form-group">
+              <label>Occupation</label>
+              <input type="text" class="form-input" id="prof-occupation" value="Employee">
+            </div>
 
-          <div class="form-group">
-            <label>Gender</label>
-            <select class="form-input">
-              <option value="Male">Male</option>
-              <option value="Female" selected>Female</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label>Gender</label>
+              <select class="form-input" id="prof-gender">
+                <option value="Male">Male</option>
+                <option value="Female" selected>Female</option>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label>Nationality</label>
-            <input type="text" class="form-input" value="Filipino">
-          </div>
+            <div class="form-group">
+              <label>Nationality</label>
+              <input type="text" class="form-input" id="prof-nationality" value="Filipino">
+            </div>
 
-          <div class="form-group">
-            <label>Monthly Income Range</label>
-            <select class="form-input">
-              <option value="">Select Income Range</option>
-              <option value="Below 10000">Below ₱10,000</option>
-              <option value="10000-19999">₱10,000 - ₱19,999</option>
-              <option value="20000-29999" selected>₱20,000 - ₱29,999</option>
-              <option value="30000-39999">₱30,000 - ₱39,999</option>
-              <option value="40000-49999">₱40,000 - ₱49,999</option>
-              <option value="50000-above">₱50,000 and above</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label>Monthly Income Range</label>
+              <select class="form-input" id="prof-income">
+                <option value="">Select Income Range</option>
+                <option value="Below 10000">Below ₱10,000</option>
+                <option value="10000-19999">₱10,000 - ₱19,999</option>
+                <option value="20000-29999" selected>₱20,000 - ₱29,999</option>
+                <option value="30000-39999">₱30,000 - ₱39,999</option>
+                <option value="40000-49999">₱40,000 - ₱49,999</option>
+                <option value="50000-above">₱50,000 and above</option>
+              </select>
+            </div>
 
-          <div class="form-group" style="grid-column: span 2;">
-            <label>Residential Address</label>
-            <input type="text" class="form-input" value="Barangay Mamatid, Cabuyao City, Laguna 4027">
-          </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label>Residential Address</label>
+              <input type="text" class="form-input" id="prof-address"
+                value="Barangay Mamatid, Cabuyao City, Laguna 4027">
+            </div>
 
+          </div>
+          <button class="btn btn-primary" onclick="handleProfileUpdate(event)"><i data-lucide="save" class="icon"></i>
+            Update Profile Information</button>
         </div>
-                  <button class="btn btn-primary" onclick="alert('Profile contact details updated successfully!')"><i data-lucide="save" class="icon"></i> Update Profile Information</button>
-                </div>
-              </section>
-            </div>
-          </div>
+      </section>
+    </div>
+  </div>
 
-          <!-- TRANSACTION DETAIL MODAL -->
-          <div class="modal-overlay" id="tx-modal">
-            <div class="modal-window">
-              <div class="modal-header">
-                <span style="color: var(--dark-green);"><i data-lucide="receipt" class="icon"></i> Transaction Official Receipt & Audit</span>
-                <button onclick="closeModal('tx-modal')" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
-              </div>
-              <div class="modal-body" id="tx-modal-body"></div>
-            </div>
-          </div>
+  <!-- TRANSACTION DETAIL MODAL -->
+  <div class="modal-overlay" id="tx-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span style="color: var(--dark-green);"><i data-lucide="receipt" class="icon"></i> Transaction Official Receipt
+          & Audit</span>
+        <button onclick="closeModal('tx-modal')"
+          style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body" id="tx-modal-body"></div>
+    </div>
+  </div>
 
+  <script src="database.js"></script>
+  <script src="shared-store.js"></script>
   <script src="member.js"></script>
 </body>
+
 </html>
