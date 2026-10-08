@@ -28,15 +28,23 @@ function handleAdminLogin(e) {
   const email = emailInput ? emailInput.value.trim().toLowerCase() : "admin@coopcore.ph";
   const pass = passwordInput ? passwordInput.value : "";
 
-  // Validate admin email and password
-  if (email !== "admin@coopcore.ph" && !email.includes("admin")) {
-    alert("Invalid credentials. Access restricted to cooperative administrative staff.");
+  // Validate admin email and password (allows Maria Santos or Eduardo Ramos)
+  const isAuthorizedStaff = email.includes("admin") || email.includes("credit") || email.includes("maria") || email.includes("eduardo");
+  if (!isAuthorizedStaff) {
+    alert("Invalid credentials. Access restricted to cooperative administrative staff (admin@coopcore.ph or credit@coopcore.ph).");
     return;
   }
 
   if (pass && pass.length < 3) {
     alert("Please enter a valid password.");
     return;
+  }
+
+  // Set staff identity based on login email
+  if (email.includes("credit") || email.includes("eduardo")) {
+    CoopStore.setActiveStaff("eduardo");
+  } else {
+    CoopStore.setActiveStaff("maria");
   }
 
   CoopStore.setAdminLoggedIn(true);
@@ -49,6 +57,62 @@ function adminLogout() {
   CoopStore.setAdminLoggedIn(false);
   document.getElementById('admin-app-screen').style.display = 'none';
   document.getElementById('admin-auth-screen').style.display = 'flex';
+}
+
+function switchAdminStaff(staffId) {
+  const staff = CoopStore.setActiveStaff(staffId);
+  renderAdminStaffHeader();
+  alert(`Active workstation staff switched to:\n${staff.name}\nRole: ${staff.role}\nTier Authority: ${staff.canEditTier ? '✓ Authorized to modify Member Credit Tiers' : 'Restricted (General Operations)'}`);
+}
+
+function renderAdminStaffHeader() {
+  const staff = CoopStore.getActiveStaff();
+  const select = document.getElementById('admin-staff-select');
+  if (select) select.value = staff.id;
+  updateDateSimulationLabel();
+}
+
+function updateDateSimulationLabel() {
+  const dateLabel = document.getElementById('admin-detected-date-label');
+  if (dateLabel) {
+    const curDate = CoopStore.getSystemDate();
+    dateLabel.innerText = curDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+}
+
+function toggleDateSimulationPrompt() {
+  const curDate = CoopStore.getSystemDate();
+  const choice = prompt(
+    `🕒 COOPERATIVE PENALTY SYSTEM & CLOCK DETECTOR\n\n` +
+    `Current Detected Date: ${curDate.toLocaleDateString()}\n\n` +
+    `To test penalties, you can EITHER:\n` +
+    `1) Change your laptop date in Windows Settings (the system detects it automatically!)\n` +
+    `OR\n` +
+    `2) Enter a test simulation date here (YYYY-MM-DD), or type "+15" to fast-forward 15 days, or "reset" to use laptop clock:`,
+    "+15"
+  );
+  if (!choice) return;
+
+  if (choice.toLowerCase() === "reset") {
+    CoopStore.setSimulatedDate(null);
+    alert("Clock reset to your laptop system date!");
+  } else if (choice === "+15" || choice === "+30") {
+    const d = new Date();
+    d.setDate(d.getDate() + (choice === "+30" ? 30 : 15));
+    CoopStore.setSimulatedDate(d.toISOString().split("T")[0]);
+    alert(`Clock simulated to: ${d.toLocaleDateString()}\nPast due loans will now calculate and display penalties!`);
+  } else {
+    const parsed = new Date(choice);
+    if (isNaN(parsed.getTime())) {
+      alert("Invalid date format. Please use YYYY-MM-DD, '+15', or 'reset'.");
+      return;
+    }
+    CoopStore.setSimulatedDate(choice);
+    alert(`Clock simulated to: ${parsed.toLocaleDateString()}\nPast due loans will now calculate and display penalties!`);
+  }
+
+  adminState = CoopStore.get();
+  renderAdminPortal();
 }
 
 function switchAdminTab(tabId) {
@@ -70,6 +134,7 @@ function switchAdminTab(tabId) {
 function renderAdminPortal() {
   // Sync state from shared store
   adminState = CoopStore.get();
+  renderAdminStaffHeader();
 
   // Update Overview Stats
   const activeMembersCount = adminState.members.filter(m => (m.status || 'ACTIVE') === 'ACTIVE').length;
@@ -217,7 +282,7 @@ function renderRegistry(list = adminState.members) {
   if (!tbody) return;
 
   if (!list || list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:18px;">No members found matching filter criteria.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:18px;">No members found matching filter criteria.</td></tr>`;
     return;
   }
 
@@ -227,17 +292,28 @@ function renderRegistry(list = adminState.members) {
     if (status === 'INACTIVE') badgeClass = 'badge-amber';
     else if (status === 'SUSPENDED') badgeClass = 'badge-red';
 
+    const tier = m.creditTier || 'Tier C (Sub Standard)';
+    let tierBadgeClass = 'badge-amber';
+    if (tier.includes('Tier A')) tierBadgeClass = 'badge-green';
+    else if (tier.includes('Tier B')) tierBadgeClass = 'badge-blue';
+
+    const overdueInfo = CoopStore.checkMemberLoanOverdue(m);
+
     return `
     <tr>
       <td><strong>${m.id}</strong></td>
       <td><code>${m.accountNumber}</code></td>
-      <td><strong>${m.name}</strong></td>
+      <td>
+        <strong>${m.name}</strong>
+        ${overdueInfo.isOverdue ? `<br><span class="badge badge-red" style="font-size:10px; margin-top:3px; display:inline-block;">⚠️ Past Due: ₱${overdueInfo.penalty} penalty</span>` : ''}
+      </td>
       <td style="color:var(--admin-green); font-weight:700;">${formatPeso(m.savingsBalance)}</td>
+      <td><span class="badge ${tierBadgeClass}" style="font-size:11px;">${tier}</span></td>
       <td><span class="badge ${badgeClass}">${status}</span></td>
       <td>
         <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
           <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="viewMemberDetails('${m.id}')">
-            <i data-lucide="eye" style="width:13px; height:13px;"></i> Details
+            <i data-lucide="eye" style="width:13px; height:13px;"></i> Details & Tier
           </button>
           <select class="form-input" style="padding:3px 6px; font-size:11px; width:auto; font-weight:700;" onchange="changeMemberStatusDirect('${m.id}', this.value)" title="Change account status in database">
             <option value="ACTIVE" ${status === 'ACTIVE' ? 'selected' : ''}>Active</option>
@@ -258,6 +334,40 @@ function changeMemberStatusDirect(memberId, newStatus) {
   }
 }
 
+function handleTierUpdateDirect(memberId) {
+  const select = document.getElementById(`modal-tier-select-${memberId}`);
+  if (!select) return;
+  const newTier = select.value;
+  const activeStaff = CoopStore.getActiveStaff();
+
+  // Enforce staff authorization: Only Credit Committee Officer (Eduardo Ramos) can authorize
+  if (!activeStaff.canEditTier) {
+    const wantSwitch = confirm(
+      `🔒 ROLE AUTHORIZATION RESTRICTION\n\n` +
+      `Access Denied: Maria Santos (General Operations Staff / Teller) does not have committee authority to alter credit ratings.\n\n` +
+      `Pursuant to Cooperative Credit Bylaws, only the designated Credit Committee Officer (Eduardo Ramos) can authorize Tier changes.\n\n` +
+      `Would you like to switch to Credit Committee Officer (Eduardo Ramos) now to authorize this tier change?`
+    );
+
+    if (wantSwitch) {
+      CoopStore.setActiveStaff("eduardo");
+      renderAdminStaffHeader();
+    } else {
+      return;
+    }
+  }
+
+  const res = CoopStore.updateMemberTier(memberId, newTier);
+  if (res.success) {
+    alert(`✓ TIER UPDATE AUTHORIZED\n\nMember credit rating successfully updated to: ${newTier}\nAuthorized Officer: ${res.authorizedBy} (Credit Committee)\n\nMember borrowing limit and database tables have been updated.`);
+    adminState = CoopStore.get();
+    viewMemberDetails(memberId);
+    renderAdminPortal();
+  } else {
+    alert(res.message);
+  }
+}
+
 function viewMemberDetails(memberId) {
   const m = CoopStore.getMemberById(memberId);
   if (!m) return;
@@ -265,6 +375,9 @@ function viewMemberDetails(memberId) {
   let badgeClass = 'badge-green';
   if (status === 'INACTIVE') badgeClass = 'badge-amber';
   else if (status === 'SUSPENDED') badgeClass = 'badge-red';
+
+  const tier = m.creditTier || 'Tier C (Sub Standard)';
+  const overdueInfo = CoopStore.checkMemberLoanOverdue(m);
 
   const modalBody = document.getElementById('account-details-modal-body');
   modalBody.innerHTML = `
@@ -274,12 +387,15 @@ function viewMemberDetails(memberId) {
           <h3 style="color:var(--admin-dark); font-size:18px; font-weight:800;">${m.name}</h3>
           <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">Member ID: <strong>${m.id}</strong> &bull; Account: <strong>${m.accountNumber}</strong></p>
         </div>
-        <span class="badge ${badgeClass}" style="font-size:12px; padding:4px 12px;">Status: ${status}</span>
+        <div style="display:flex; gap:6px;">
+          <span class="badge badge-green" style="font-size:12px; padding:4px 10px;">${tier}</span>
+          <span class="badge ${badgeClass}" style="font-size:12px; padding:4px 10px;">Status: ${status}</span>
+        </div>
       </div>
     </div>
 
     <!-- Interactive Database Account Status Control -->
-    <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:16px;">
+    <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
       <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">Update Database Account Status</label>
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <select id="modal-status-select-${m.id}" class="form-input" style="max-width:200px; padding:6px 10px; font-size:12px; font-weight:700;">
@@ -287,8 +403,33 @@ function viewMemberDetails(memberId) {
           <option value="INACTIVE" ${status === 'INACTIVE' ? 'selected' : ''}>INACTIVE (Dormant)</option>
           <option value="SUSPENDED" ${status === 'SUSPENDED' ? 'selected' : ''}>SUSPENDED (Restricted)</option>
         </select>
-        <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="changeMemberStatusDirect('${m.id}', document.getElementById('modal-status-select-${m.id}').value); viewMemberDetails('${m.id}');">
+        <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="changeMemberStatusDirect('${m.id}', document.getElementById('modal-status-select-${m.id}').value); viewMemberDetails('${m.id}');">
           Save Status
+        </button>
+      </div>
+    </div>
+
+    <!-- Member Credit Tier & Loan Limit (Bylaw Authority: Credit Committee Only) -->
+    <div style="background:#F0FDF4; border:1px solid var(--admin-border-green); border-radius:8px; padding:12px 14px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+        <label style="font-size:11px; text-transform:uppercase; color:var(--dark-green); font-weight:800; margin:0;">
+          Member Credit Tier & Loan Facility
+        </label>
+        <span style="font-size:11px; background:#DCFCE7; color:var(--dark-green); padding:2px 8px; border-radius:4px; font-weight:700;">
+          🔒 Authorized Officer: Eduardo Ramos (Credit Committee)
+        </span>
+      </div>
+      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">
+        All new members start at <strong>Tier C (Max ₱50k)</strong>. Modifications must be evaluated and approved by designated Credit Committee Officer.
+      </p>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <select id="modal-tier-select-${m.id}" class="form-input" style="max-width:270px; padding:6px 10px; font-size:12px; font-weight:700;">
+          <option value="Tier C (Sub Standard)" ${tier.includes('Tier C') ? 'selected' : ''}>Tier C (Sub Standard) - Max ₱50,000 [Default]</option>
+          <option value="Tier B (Standard)" ${tier.includes('Tier B') ? 'selected' : ''}>Tier B (Standard) - Max ₱100,000</option>
+          <option value="Tier A (Prime)" ${tier.includes('Tier A') ? 'selected' : ''}>Tier A (Prime) - Max ₱150,000</option>
+        </select>
+        <button class="btn btn-primary" style="padding:6px 14px; font-size:12px;" onclick="handleTierUpdateDirect('${m.id}')">
+          Authorize Tier Change
         </button>
       </div>
     </div>
@@ -298,10 +439,16 @@ function viewMemberDetails(memberId) {
       <div><span style="color:var(--text-muted);">Email:</span> <strong>${m.email || '-'}</strong></div>
       <div><span style="color:var(--text-muted);">Registered Savings:</span> <strong style="color:var(--admin-green);">${formatPeso(m.savingsBalance)}</strong></div>
       <div><span style="color:var(--text-muted);">Active Loan Balance:</span> <strong style="color:var(--crimson);">${formatPeso(m.activeLoanBalance)}</strong></div>
-      <div><span style="color:var(--text-muted);">Occupation:</span> <strong>${m.occupation || '-'}</strong></div>
       <div><span style="color:var(--text-muted);">Monthly Due:</span> <strong>${formatPeso(m.monthlyDue || 0)}</strong></div>
+      <div><span style="color:var(--text-muted);">Amortization Due Date:</span> <strong>${m.loanDueDate || 'None'}</strong></div>
+      <div style="grid-column:span 2; background:${overdueInfo.isOverdue ? '#FFF5F5' : '#F8FAFC'}; border:1px solid ${overdueInfo.isOverdue ? '#FED7D7' : 'var(--border)'}; padding:8px 10px; border-radius:6px;">
+        <span style="color:var(--text-muted);">Loan Overdue Status:</span> 
+        ${overdueInfo.isOverdue
+      ? `<strong style="color:var(--crimson);">⚠️ PAST DUE (${overdueInfo.daysOverdue} days late) &bull; Assessed Late Penalty: ${formatPeso(overdueInfo.penalty)} &bull; Total Due Now: ${formatPeso(overdueInfo.totalDue)}</strong>`
+      : `<strong style="color:var(--admin-green);">✓ Up to date (No penalties assessed)</strong>`}
+      </div>
       <div style="grid-column:span 2;"><span style="color:var(--text-muted);">Registered Address:</span> <strong>${m.address || '-'}</strong></div>
-      <div style="grid-column:span 2;"><span style="color:var(--text-muted);">Account Standing:</span> <strong style="color:var(--admin-green);">${m.accountStanding || m.creditTier || 'Good Standing'}</strong></div>
+      <div style="grid-column:span 2;"><span style="color:var(--text-muted);">Account Standing:</span> <strong style="color:var(--admin-green);">${m.accountStanding || tier || 'Good Standing'}</strong></div>
     </div>
     <button class="btn btn-outline" style="width:100%; justify-content:center;" onclick="closeModal('account-details-modal')">Close Account Details</button>
   `;

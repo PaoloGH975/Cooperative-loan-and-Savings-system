@@ -29,6 +29,16 @@
           <label style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">Staff Email</label>
           <input type="email" id="admin-email" class="form-input" style="width: 100%;" value="admin@coopcore.ph"
             required>
+          <div
+            style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between;">
+            <span>Quick Select:</span>
+            <span>
+              <a href="javascript:void(0)" onclick="document.getElementById('admin-email').value='admin@coopcore.ph'"
+                style="color:var(--admin-green); text-decoration:none; font-weight:600;">Maria Santos (Teller)</a> |
+              <a href="javascript:void(0)" onclick="document.getElementById('admin-email').value='credit@coopcore.ph'"
+                style="color:var(--admin-green); text-decoration:none; font-weight:600;">Eduardo Ramos (Credit)</a>
+            </span>
+          </div>
         </div>
         <div class="password-wrapper">
           <input type="password" id="password" placeholder="Enter password">
@@ -52,8 +62,31 @@
         <span>CoopCore Enterprise</span>
         <span class="badge-admin">Admin Workstation</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <span style="font-size: 13px; color: var(--text-muted);">Officer: <strong>Maria Santos</strong></span>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- Active Staff Switcher with Role Indicator -->
+        <div
+          style="display: flex; align-items: center; gap: 6px; background: #F8FAFC; border: 1px solid var(--border); padding: 4px 10px; border-radius: 8px;">
+          <i data-lucide="user-check" style="width: 14px; height: 14px; color: var(--admin-green);"></i>
+          <span style="font-size: 12px; color: var(--text-muted);">Active Staff:</span>
+          <select id="admin-staff-select" onchange="switchAdminStaff(this.value)"
+            style="border: none; background: transparent; font-size: 12.5px; font-weight: 700; color: var(--admin-dark); cursor: pointer; outline: none;">
+            <option value="maria">Maria Santos (Operations Staff / Teller)</option>
+            <option value="eduardo">Eduardo Ramos (Credit Committee Officer 🔒 Tier Authorized)</option>
+          </select>
+        </div>
+
+        <!-- Date & Penalty Simulation Badge for Demo Testing -->
+        <div id="admin-date-simulator-badge"
+          style="display: inline-flex; align-items: center; gap: 6px; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 4px 10px; border-radius: 8px; font-size: 12px; color: #1E40AF;">
+          <i data-lucide="calendar" style="width: 13px; height: 13px;"></i>
+          <span>Clock: <strong id="admin-detected-date-label">Today</strong></span>
+          <button type="button" class="btn btn-outline" onclick="toggleDateSimulationPrompt()"
+            style="font-size: 11px; padding: 2px 6px; height: auto; border-color: #93C5FD; color: #1D4ED8; background: #DBEAFE;"
+            title="Click to test past-due date penalty simulation without altering Windows clock">
+            Test Overdue Date
+          </button>
+        </div>
+
         <a href="member.html" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 10px;"><i
             data-lucide="external-link" class="icon"></i> Member Portal</a>
         <button class="btn btn-outline" onclick="adminLogout()" style="font-size: 12px; padding: 6px 10px;"><i
@@ -208,6 +241,7 @@
                     <th>Account Number</th>
                     <th>Full Name</th>
                     <th>Savings Balance</th>
+                    <th>Credit Tier</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>

@@ -28,8 +28,9 @@
         savingsBalance: 8500.00,
         activeLoanBalance: 6183.34,
         monthlyDue: 883.33,
-        creditTier: "Tier A (Prime)",
-        accountStanding: "In Good Standing (Prime)",
+        loanDueDate: "2026-10-15",
+        creditTier: "Tier C (Sub Standard)",
+        accountStanding: "Standard Member (Tier C)",
         status: "ACTIVE",
         password: "password123",
         activeLoanRef: "LN-2024-089",
@@ -92,6 +93,7 @@
         savingsBalance: 1200.00,
         activeLoanBalance: 4100.00,
         monthlyDue: 683.33,
+        loanDueDate: "2026-10-05",
         creditTier: "Tier C (Sub Standard)",
         accountStanding: "Probationary (< ₱6,000 threshold)",
         status: "ACTIVE",
@@ -144,8 +146,9 @@
         savingsBalance: 15000.00,
         activeLoanBalance: 0.00,
         monthlyDue: 0.00,
-        creditTier: "Tier A (Prime)",
-        accountStanding: "In Good Standing (Prime)",
+        loanDueDate: null,
+        creditTier: "Tier C (Sub Standard)",
+        accountStanding: "In Good Standing (Tier C)",
         status: "ACTIVE",
         password: "password123",
         activeLoanRef: "",
@@ -264,6 +267,18 @@
           const parsed = JSON.parse(item);
           // Verify that state contains necessary arrays
           if (parsed && Array.isArray(parsed.members)) {
+            let changed = false;
+            parsed.members.forEach(m => {
+              if (m.activeLoanBalance > 0 && !m.loanDueDate) {
+                m.loanDueDate = m.id === "MEM-002" ? "2026-10-05" : "2026-10-15";
+                changed = true;
+              }
+              if (!m.creditTier) {
+                m.creditTier = "Tier C (Sub Standard)";
+                changed = true;
+              }
+            });
+            if (changed) saveState(parsed);
             return parsed;
           }
         }
@@ -292,6 +307,51 @@
     }
   }
 
+  // Live phpMyAdmin / MySQL Synchronizer
+  function sendToApi(action, payload) {
+    try {
+      if (typeof window === "undefined" || !window.fetch) return;
+      const isHttp = window.location.protocol.startsWith('http');
+      const endpoint = isHttp
+        ? 'api.php?action=' + action
+        : 'http://localhost/Cooperative-loan-and-Savings-system/api.php?action=' + action;
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success) {
+            console.log(`%c[phpMyAdmin MySQL Synchronized] ${data.message}`, 'color: #059669; font-weight: bold;');
+          }
+        })
+        .catch(() => {
+          // Fallback silently if XAMPP MySQL is not started
+        });
+    } catch (e) { }
+  }
+
+  const STAFF_ACCOUNTS = {
+    "maria": {
+      id: "maria",
+      name: "Maria Santos",
+      email: "admin@coopcore.ph",
+      role: "Operations Admin / Teller",
+      canEditTier: false,
+      badge: "General Staff"
+    },
+    "eduardo": {
+      id: "eduardo",
+      name: "Eduardo Ramos",
+      email: "credit@coopcore.ph",
+      role: "Credit Committee Officer",
+      canEditTier: true,
+      badge: "Credit Committee (Tier Authorized)"
+    }
+  };
+
   const CoopStore = {
     formatPeso: function (val) {
       const num = Number(val) || 0;
@@ -300,6 +360,172 @@
 
     get: function () {
       return loadState();
+    },
+
+    // Staff & Role Authorization
+    getActiveStaff: function () {
+      try {
+        if (typeof window !== "undefined" && window.sessionStorage) {
+          const saved = window.sessionStorage.getItem("coop_active_staff_id");
+          if (saved && STAFF_ACCOUNTS[saved]) return STAFF_ACCOUNTS[saved];
+        }
+      } catch (e) { }
+      return STAFF_ACCOUNTS["maria"];
+    },
+
+    setActiveStaff: function (staffId) {
+      const staff = STAFF_ACCOUNTS[staffId] || STAFF_ACCOUNTS["maria"];
+      try {
+        if (typeof window !== "undefined" && window.sessionStorage) {
+          window.sessionStorage.setItem("coop_active_staff_id", staff.id);
+        }
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("coop-staff-changed", { detail: staff }));
+        }
+      } catch (e) { }
+      return staff;
+    },
+
+    getStaffAccounts: function () {
+      return Object.values(STAFF_ACCOUNTS);
+    },
+
+    // Laptop System Clock & Demo Simulation
+    getSystemDate: function () {
+      try {
+        if (typeof window !== "undefined" && window.sessionStorage) {
+          const sim = window.sessionStorage.getItem("coop_simulated_date");
+          if (sim) return new Date(sim);
+        }
+      } catch (e) { }
+      return new Date(); // Direct reading from user's laptop clock!
+    },
+
+    setSimulatedDate: function (dateStr) {
+      try {
+        if (typeof window !== "undefined" && window.sessionStorage) {
+          if (dateStr) {
+            window.sessionStorage.setItem("coop_simulated_date", dateStr);
+          } else {
+            window.sessionStorage.removeItem("coop_simulated_date");
+          }
+          window.dispatchEvent(new CustomEvent("coop-date-changed", { detail: this.getSystemDate() }));
+        }
+      } catch (e) { }
+    },
+
+    // Dynamic Loan Due Date & Overdue Penalty Assessment
+    checkMemberLoanOverdue: function (member, customDate = null) {
+      if (!member) return { isOverdue: false, daysOverdue: 0, penalty: 0, totalDue: 0, dueDate: null };
+      if (!member.activeLoanBalance || member.activeLoanBalance <= 0) {
+        return { isOverdue: false, daysOverdue: 0, penalty: 0, totalDue: 0, dueDate: null };
+      }
+
+      const dueDateStr = member.loanDueDate || "2026-10-15";
+      const dueDate = new Date(dueDateStr + "T23:59:59");
+      const currentDate = customDate ? new Date(customDate) : this.getSystemDate();
+
+      if (currentDate.getTime() > dueDate.getTime()) {
+        const diffMs = currentDate.getTime() - dueDate.getTime();
+        const daysOverdue = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+        // Cooperative late penalty: 5% of monthly amortization (minimum ₱150.00 surcharge)
+        const monthly = Number(member.monthlyDue) || 0;
+        const penalty = Math.max(150, Math.round(monthly * 0.05 * 100) / 100);
+        const totalDue = Math.round((monthly + penalty) * 100) / 100;
+
+        return {
+          isOverdue: true,
+          daysOverdue: daysOverdue,
+          penalty: penalty,
+          monthlyDue: monthly,
+          totalDue: totalDue,
+          dueDate: dueDateStr,
+          currentDateFormatted: currentDate.toLocaleDateString()
+        };
+      } else {
+        const monthly = Number(member.monthlyDue) || 0;
+        return {
+          isOverdue: false,
+          daysOverdue: 0,
+          penalty: 0,
+          monthlyDue: monthly,
+          totalDue: monthly,
+          dueDate: dueDateStr,
+          currentDateFormatted: currentDate.toLocaleDateString()
+        };
+      }
+    },
+
+    // Update Member Credit Tier (Restricted to Credit Committee)
+    updateMemberTier: function (memberId, newTier, requestedByStaffId = null) {
+      const state = loadState();
+      const member = state.members.find(m => m.id === memberId);
+      if (!member) return { success: false, message: "Member record not found." };
+
+      const activeStaff = this.getActiveStaff();
+      const staffId = requestedByStaffId || activeStaff.id;
+      const staff = STAFF_ACCOUNTS[staffId] || activeStaff;
+
+      if (!staff.canEditTier) {
+        return {
+          success: false,
+          unauthorized: true,
+          message: `Permission Denied: Only designated Credit Committee Officers (${STAFF_ACCOUNTS['eduardo'].name}) can approve and modify Member Credit Tiers pursuant to Cooperative Bylaws.\n\nCurrent Staff: ${staff.name} (${staff.role}).`
+        };
+      }
+
+      const oldTier = member.creditTier || "Tier C (Sub Standard)";
+      member.creditTier = newTier;
+
+      if (newTier.includes("Tier A")) {
+        member.accountStanding = "Prime Member (Max ₱150k limit)";
+      } else if (newTier.includes("Tier B")) {
+        member.accountStanding = "Standard Member (Max ₱100k limit)";
+      } else {
+        member.accountStanding = "Entry Member (Max ₱50k limit)";
+      }
+
+      // Add audit memorandum transaction
+      const auditRef = "TIER-AUDIT-" + Math.floor(1000 + Math.random() * 9000);
+      const now = this.getSystemDate().toLocaleString();
+      if (!member.transactions) member.transactions = [];
+      member.transactions.unshift({
+        ref: auditRef,
+        date: now,
+        type: "Credit Rating Adjustment",
+        category: "Credit Committee Board Resolution",
+        channel: `Authorized by ${staff.name}`,
+        amount: 0,
+        fee: 0,
+        balanceAfter: member.savingsBalance,
+        status: "COMPLETED",
+        remarks: `Credit Tier upgraded from ${oldTier} to ${newTier} by Credit Committee Officer ${staff.name}.`
+      });
+
+      saveState(state);
+
+      // Sync to database.js
+      try {
+        if (global.Database && typeof global.Database.update === "function") {
+          const finRecords = global.Database.getTable("MembersFinanceDatatbl");
+          const fRec = (finRecords || []).find(r => r.memberId === memberId);
+          if (fRec) {
+            global.Database.update("MembersFinanceDatatbl", fRec.id, { creditStanding: newTier });
+          }
+        }
+      } catch (e) { }
+
+      // Sync to MySQL via api.php
+      sendToApi('update_tier', { memberId: memberId, newTier: newTier });
+
+      return {
+        success: true,
+        member: member,
+        oldTier: oldTier,
+        newTier: newTier,
+        authorizedBy: staff.name
+      };
     },
 
     save: function (state) {
@@ -370,6 +596,15 @@
       if (idx !== -1) {
         state.members[idx] = { ...state.members[idx], ...updates };
         saveState(state);
+
+        // Sync profile changes to phpMyAdmin (CoopMemberstbl)
+        sendToApi('update_profile', {
+          memberId: id,
+          phone: state.members[idx].phone,
+          email: state.members[idx].email,
+          name: state.members[idx].name
+        });
+
         return state.members[idx];
       }
       return null;
@@ -390,6 +625,7 @@
       }
 
       saveState(state);
+      sendToApi('update_status', { memberId: memberId, newStatus: newStatus });
       return member;
     },
 
@@ -423,6 +659,22 @@
 
       state.pendingApprovals.push(newApp);
       saveState(state);
+
+      // Record live into phpMyAdmin (membershipApplicationtbl)
+      sendToApi('apply_membership', {
+        id: id,
+        fullLegalName: newApp.name,
+        email: newApp.email,
+        contactNumber: newApp.phone,
+        address: newApp.address,
+        occupation: newApp.occupation,
+        incomeRange: newApp.income,
+        pmesCompleted: newApp.pmesCompleted ? 1 : 0,
+        initialShareCapital: newApp.initialShareCapital,
+        password: newApp.password,
+        dateApplied: new Date().toISOString().split("T")[0]
+      });
+
       return newApp;
     },
 
@@ -456,8 +708,9 @@
         savingsBalance: initialCapital,
         activeLoanBalance: 0.00,
         monthlyDue: 0.00,
-        creditTier: "Tier A (Prime)",
-        accountStanding: "In Good Standing (Prime)",
+        loanDueDate: null,
+        creditTier: "Tier C (Sub Standard)",
+        accountStanding: "New Member (Tier C)",
         status: "ACTIVE",
         password: app.password || "password123",
         activeLoanRef: "",
@@ -493,6 +746,20 @@
       state.members.push(newMember);
       state.pendingApprovals = state.pendingApprovals.filter(a => a.id !== id);
       saveState(state);
+
+      // Record live into phpMyAdmin (CoopMemberstbl, MembersFinanceDatatbl, and MembersDeposit)
+      sendToApi('approve_membership', {
+        id: id,
+        memberId: memberId,
+        accountNumber: accountNumber,
+        fullName: newMember.name,
+        email: newMember.email,
+        password: newMember.password,
+        contactNumber: newMember.phone,
+        initialShareCapital: initialCapital,
+        dateRegistered: new Date().toISOString().split("T")[0]
+      });
+
       return newMember;
     },
 
@@ -502,6 +769,10 @@
       if (!app) return null;
       state.pendingApprovals = state.pendingApprovals.filter(a => a.id !== id);
       saveState(state);
+
+      // Record rejection in phpMyAdmin (membershipApplicationtbl)
+      sendToApi('reject_membership', { id: id });
+
       return app;
     },
 
@@ -544,6 +815,15 @@
       });
 
       saveState(state);
+      sendToApi('deposit', {
+        id: "DEP-" + Math.floor(1000 + Math.random() * 9000),
+        memberId: member.id,
+        depositAmount: amt,
+        depositType: type || "Compulsory Monthly Savings",
+        paymentChannel: channel || "GCash Direct Pay",
+        referenceNumber: ref,
+        dateDeposited: now
+      });
       return { member, transaction: tx };
     },
 
@@ -588,6 +868,17 @@
       });
 
       saveState(state);
+      sendToApi('transfer', {
+        id: "WDL-" + Math.floor(1000 + Math.random() * 9000),
+        memberId: member.id,
+        withdrawalAmount: amt,
+        destinationBank: bank,
+        targetAccountNumber: accNum,
+        accountHolderName: accName || member.name,
+        serviceFee: fee,
+        transactionDate: now,
+        referenceNumber: ref
+      });
       return { success: true, ref: ref, member, transaction: tx, netReceived: amt - fee };
     },
 
@@ -600,7 +891,13 @@
       const amt = Number(amount);
       if (amt <= 0) return { success: false, message: "Invalid payment amount." };
       if (member.activeLoanBalance <= 0) return { success: false, message: "No active loan balance to repay." };
-      if (amt > member.activeLoanBalance) return { success: false, message: "Amount exceeds remaining loan balance." };
+      const overdue = this.checkMemberLoanOverdue(member);
+      const penaltyFee = overdue.isOverdue ? overdue.penalty : 0.00;
+      const maxPayable = member.activeLoanBalance + penaltyFee;
+
+      if (amt > maxPayable) {
+        return { success: false, message: `Amount exceeds total outstanding balance plus late penalties (${CoopStore.formatPeso(maxPayable)}).` };
+      }
 
       if (source === "Savings") {
         if (member.savingsBalance < amt) {
@@ -609,29 +906,46 @@
         member.savingsBalance -= amt;
       }
 
-      member.activeLoanBalance = Math.max(0, member.activeLoanBalance - amt);
+      // Late penalty surcharge is settled first, remainder reduces active loan principal
+      let principalDeduction = amt;
+      if (penaltyFee > 0) {
+        principalDeduction = Math.max(0, amt - penaltyFee);
+      }
+
+      member.activeLoanBalance = Math.max(0, member.activeLoanBalance - principalDeduction);
       if (member.activeLoanBalance === 0) {
         member.monthlyDue = 0.00;
         member.activeLoanRef = "";
+        member.loanDueDate = null;
       } else {
         member.monthlyDue = Math.min(member.monthlyDue, member.activeLoanBalance);
+        // Advance next due date by 30 days if overdue or unassigned
+        if (overdue.isOverdue || !member.loanDueDate) {
+          const nextDue = new Date(this.getSystemDate());
+          nextDue.setDate(nextDue.getDate() + 30);
+          member.loanDueDate = nextDue.toISOString().split("T")[0];
+        }
       }
 
       const receiptRef = "RCT-" + Math.floor(8840 + Math.random() * 1000);
-      const now = new Date().toLocaleString();
+      const now = this.getSystemDate().toLocaleString();
       const channelLabel = source === "Savings" ? "Savings Auto-Debit" : (source === "GCash" ? "GCash / Maya QR Payment" : "Direct Online Banking");
+
+      const txRemarks = penaltyFee > 0
+        ? `Repayment credited to ${member.activeLoanRef || 'Active Loan'}. Paid ${CoopStore.formatPeso(principalDeduction)} principal + ${CoopStore.formatPeso(penaltyFee)} late penalty. Remaining balance: ${CoopStore.formatPeso(member.activeLoanBalance)}`
+        : `Repayment credited to ${member.activeLoanRef || 'Active Loan'}. Remaining balance: ${CoopStore.formatPeso(member.activeLoanBalance)}`;
 
       const tx = {
         ref: receiptRef,
         date: now,
         type: "Loan Repayment",
-        category: "Amortization Settlement",
+        category: penaltyFee > 0 ? "Amortization + Late Penalty" : "Amortization Settlement",
         channel: channelLabel,
         amount: -amt,
-        fee: 0.00,
+        fee: penaltyFee,
         balanceAfter: member.savingsBalance,
         status: "COMPLETED",
-        remarks: `Repayment credited to ${member.activeLoanRef || 'Active Loan'}. Remaining balance: ${CoopStore.formatPeso(member.activeLoanBalance)}`
+        remarks: txRemarks
       };
 
       member.transactions.unshift(tx);
@@ -643,9 +957,9 @@
         bankAccount: `${channelLabel} (${member.accountNumber})`,
         received: amt,
         charges: 0.00,
-        penalties: 0.00,
+        penalties: penaltyFee,
         remainingBalance: member.activeLoanBalance,
-        date: new Date().toLocaleDateString()
+        date: this.getSystemDate().toLocaleDateString()
       });
 
       if (source === "Savings") {
@@ -661,7 +975,19 @@
       }
 
       saveState(state);
-      return { success: true, ref: receiptRef, member, transaction: tx };
+      sendToApi('repayment', {
+        id: "REPAY-" + Math.floor(1000 + Math.random() * 9000),
+        memberId: member.id,
+        loanAppId: member.activeLoanRef || 'LN-ACTIVE',
+        amountPaid: amt,
+        paymentSource: channelLabel,
+        penaltyFee: penaltyFee,
+        remainingBalance: member.activeLoanBalance,
+        paymentDate: this.getSystemDate().toISOString().split('T')[0],
+        receiptNumber: receiptRef,
+        nextDueDate: member.loanDueDate
+      });
+      return { success: true, ref: receiptRef, member, transaction: tx, penaltyPaid: penaltyFee };
     },
 
     // Apply for loan
@@ -711,6 +1037,36 @@
 
       state.loanApplications.unshift(newApp);
       saveState(state);
+
+      // Record to Database module in database.js
+      try {
+        if (global.Database && typeof global.Database.insert === "function") {
+          global.Database.insert("LoanApplicationsTbl", {
+            id: ref,
+            memberId: member.id,
+            loanPackage: data.package || "Regular Productive",
+            requestedAmount: amt,
+            loanTermMonths: term,
+            loanPurpose: data.purpose || "General Purpose",
+            applicationStatus: "PENDING",
+            dateApplied: new Date().toISOString().split("T")[0]
+          });
+        }
+      } catch (err) {
+        console.warn("Database sync notice:", err);
+      }
+
+      // Record live into phpMyAdmin (MySQL)
+      sendToApi('apply_loan', {
+        id: ref,
+        memberId: member.id,
+        loanPackage: data.package || "Regular Productive",
+        requestedAmount: amt,
+        loanTermMonths: term,
+        loanPurpose: data.purpose || "General Purpose",
+        dateApplied: new Date().toISOString().split("T")[0]
+      });
+
       return { success: true, application: newApp };
     },
 
@@ -735,6 +1091,9 @@
       member.activeLoanBalance += amt;
       member.monthlyDue = monthlyPayment;
       member.activeLoanRef = "LN-2026-" + Math.floor(100 + Math.random() * 900);
+      const nextDue = new Date(this.getSystemDate());
+      nextDue.setDate(nextDue.getDate() + 30);
+      member.loanDueDate = nextDue.toISOString().split("T")[0];
 
       // Disburse into savings or record disbursal transaction
       const disbRef = "DISB-" + Math.floor(10000 + Math.random() * 90000);
@@ -755,6 +1114,21 @@
 
       state.loanApplications = state.loanApplications.filter(a => a.ref !== ref);
       saveState(state);
+
+      try {
+        if (global.Database && typeof global.Database.update === "function") {
+          global.Database.update("LoanApplicationsTbl", ref, { applicationStatus: "APPROVED" });
+        }
+      } catch (err) { }
+
+      sendToApi('grant_loan', {
+        ref: ref,
+        memberId: member.id,
+        loanBalance: member.activeLoanBalance,
+        monthlyDue: member.monthlyDue,
+        loanDueDate: member.loanDueDate
+      });
+
       return { success: true, member, application: app };
     },
 
@@ -766,6 +1140,15 @@
 
       state.loanApplications = state.loanApplications.filter(a => a.ref !== ref);
       saveState(state);
+
+      try {
+        if (global.Database && typeof global.Database.update === "function") {
+          global.Database.update("LoanApplicationsTbl", ref, { applicationStatus: "REJECTED" });
+        }
+      } catch (err) { }
+
+      sendToApi('reject_loan', { ref: ref });
+
       return { success: true, application: app };
     }
   };

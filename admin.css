@@ -497,6 +497,10 @@ body {
     padding: 20px;
 }
 
+/* ========================================================
+   RESPONSIVE DESIGN & MOBILE MEDIA QUERIES (ADMIN PORTAL)
+   ======================================================== */
+
 @media (max-width: 900px) {
     .admin-layout {
         flex-direction: column;
@@ -512,5 +516,161 @@ body {
     .admin-menu {
         flex-direction: row;
         overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 14px;
+        gap: 6px;
+    }
+
+    .menu-item {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .admin-content {
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Top Bar Header */
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 16px;
+    }
+
+    .top-bar>div:first-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .top-bar>div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* All Section Headers and Filter Bars */
+    .admin-pane .card>div:first-child {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px;
+    }
+
+    .admin-pane .card>div:first-child>div {
+        flex-direction: column;
+        align-items: stretch !important;
+        width: 100%;
+        gap: 8px;
+    }
+
+    /* Filter Inputs and Dropdowns */
+    #approvals-search-input,
+    #approvals-filter-pmes,
+    #registry-search-input,
+    #registry-filter-tier,
+    #savings-search-input,
+    #savings-filter-category,
+    #ledger-search-input,
+    #ledger-filter-category,
+    #loans-search-input,
+    #loans-filter-pkg,
+    #payment-search-input,
+    #payment-filter-channel {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Tables */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px 12px;
+        font-size: 12.5px;
+        white-space: nowrap;
+    }
+
+    /* Stat Cards */
+    .grid-4 {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    .stat-val {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 540px) {
+
+    /* Overview grid */
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Admin Auth Screen */
+    #admin-auth-screen {
+        padding: 14px 10px;
+    }
+
+    #admin-auth-screen .card {
+        padding: 24px 18px !important;
+        max-width: 100%;
+    }
+
+    /* Memorandums */
+    .memo-card {
+        padding: 14px 12px;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-window {
+        max-width: 100%;
+        width: 100%;
+        margin: auto;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .modal-body {
+        padding: 16px 14px;
+    }
+
+    /* Account Details Modal 2-column info grid */
+    #account-details-modal-body div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+
+    .form-input {
+        font-size: 14px;
+        padding: 9px 12px;
+    }
+
+    .btn {
+        padding: 9px 12px;
+        font-size: 12.5px;
     }
 }

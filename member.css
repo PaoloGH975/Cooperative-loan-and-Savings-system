@@ -80,6 +80,14 @@ body {
     font-weight: 700;
 }
 
+.brand-actions {
+    display: block;
+}
+
+.logout-top-btn {
+    display: none;
+}
+
 .sidebar-menu {
     display: flex;
     flex-direction: column;
@@ -147,39 +155,6 @@ body {
     display: none;
 }
 
-/* MOBILE */
-
-@media (max-width: 768px) {
-
-    .sidebar {
-        width: 70px;
-        padding: 20px 10px;
-    }
-
-    .sidebar-brand {
-        padding: 0 5px 20px;
-    }
-
-    .sidebar-brand .brand span,
-    .sidebar-brand .brand-badge,
-    .sidebar-link span {
-        display: none;
-    }
-
-    .sidebar-brand .brand {
-        justify-content: center;
-    }
-
-    .sidebar-link {
-        justify-content: center;
-        padding: 12px;
-    }
-
-    #app-screen .container {
-        margin-left: 70px;
-        padding: 16px;
-    }
-}
 
 .password-wrapper {
     position: relative;
@@ -521,14 +496,301 @@ body {
     padding: 20px;
 }
 
+/* ========================================================
+   RESPONSIVE DESIGN & MOBILE MEDIA QUERIES (MEMBER PORTAL)
+   Matches Admin Portal Layout: Top Horizontal Swipeable Bar
+   ======================================================== */
+
+@media (max-width: 900px) {
+    .sidebar {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+        padding: 0 !important;
+        background: #FFFFFF;
+        display: flex !important;
+        flex-direction: column !important;
+        z-index: 100;
+    }
+
+    .sidebar-brand {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-brand .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .sidebar-brand .brand span {
+        display: inline !important;
+    }
+
+    .sidebar-brand .brand-badge {
+        display: inline-block !important;
+        margin: 0 !important;
+    }
+
+    .brand-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .logout-top-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background: #FFF5F5;
+        border: 1px solid #FED7D7;
+        color: #E53E3E;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .logout-top-btn:hover {
+        background: #FED7D7;
+        color: #C53030;
+    }
+
+    .logout-top-btn svg,
+    .logout-top-btn i {
+        width: 14px;
+        height: 14px;
+    }
+
+    .sidebar-menu {
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 14px !important;
+        gap: 6px !important;
+        width: 100%;
+        scrollbar-width: none;
+    }
+
+    .sidebar-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-link {
+        width: auto !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        border-radius: 8px !important;
+    }
+
+    .sidebar-link span {
+        display: inline !important;
+    }
+
+    .sidebar-bottom {
+        display: none !important;
+    }
+
+    #app-screen .container {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 20px 16px !important;
+    }
+}
+
 @media (max-width: 768px) {
     .grid-3 {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    .navbar {
+    .card {
+        padding: 18px 16px;
+        margin-bottom: 16px;
+    }
+
+    /* Transactions Header & Filter Controls */
+    #view-transactions .card>div:first-child {
         flex-direction: column;
-        align-items: stretch;
+        align-items: stretch !important;
         gap: 12px;
+    }
+
+    #view-transactions .card>div:first-child>div {
+        flex-direction: column;
+        align-items: stretch !important;
+        width: 100%;
+    }
+
+    #tx-search-input,
+    #tx-filter-type {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+    }
+}
+
+@media (max-width: 640px) {
+
+    /* Auth / Login Screen */
+    #auth-screen {
+        padding: 14px 10px;
+    }
+
+    #auth-screen .card {
+        padding: 24px 18px !important;
+        max-width: 100%;
+    }
+
+    /* Dashboard account overview banner */
+    #view-dashboard .card:first-child>div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 14px;
+    }
+
+    #view-dashboard .card:first-child>div>div:last-child {
+        text-align: left !important;
+        width: 100%;
+    }
+
+    #user-display-balance {
+        font-size: 26px !important;
+    }
+
+    #user-display-name {
+        font-size: 20px !important;
+    }
+
+    /* Metric boxes */
+    .metric-val {
+        font-size: 20px !important;
+    }
+
+    /* Profile Page 2-column grid collapses to 1 column */
+    #view-profile .card>div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Profile header status and tier badges stack cleanly */
+    #view-profile .card>div:first-child {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 14px;
+    }
+
+    #view-profile .card>div:first-child>div:last-child {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    #view-profile .card>div:first-child>div:last-child>div {
+        width: 100%;
+    }
+
+    /* Forms on Deposit, Bank Transfer, Repayment, Apply Loan */
+    #view-deposit .card,
+    #view-transfer .card,
+    #view-repay .card,
+    #view-apply .card,
+    #view-profile .card {
+        max-width: 100% !important;
+        padding: 16px;
+    }
+
+    .form-input {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    /* Modal Windows */
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-window {
+        max-width: 100%;
+        width: 100%;
+        margin: auto;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .modal-body {
+        padding: 16px 14px;
+    }
+
+    /* Tables */
+    .data-table th,
+    .data-table td {
+        padding: 10px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 14px 12px;
+        border-radius: 10px;
+    }
+
+    #user-display-acc {
+        word-break: break-all;
+    }
+
+    .sidebar-menu {
+        padding: 8px 10px !important;
+        gap: 4px !important;
+    }
+
+    .sidebar-link {
+        padding: 7px 10px !important;
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .logout-top-btn span {
+        display: none;
+    }
+
+    .logout-top-btn {
+        padding: 5px 8px;
     }
 }

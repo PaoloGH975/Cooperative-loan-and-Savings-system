@@ -33,13 +33,22 @@ function toggleAuthMode(mode) {
 
   const submitBtn = document.getElementById('auth-submit-btn');
   if (submitBtn) {
-    submitBtn.innerHTML = `<i data-lucide="${isReg ? 'user-plus' : 'log-in'}" class="icon"></i> ${isReg ? 'Submit Registration' : 'Authenticate'}`;
+    submitBtn.innerHTML = `<i data-lucide="${isReg ? 'user-plus' : 'log-in'}" class="icon"></i> ${isReg ? 'Submit Registration' : 'Login'}`;
   }
 
-  const loginTab = document.getElementById('auth-login-tab');
-  const regTab = document.getElementById('auth-reg-tab');
-  if (loginTab) loginTab.className = isReg ? 'btn btn-outline' : 'btn btn-primary';
-  if (regTab) regTab.className = isReg ? 'btn btn-primary' : 'btn btn-outline';
+  const switchPrompt = document.getElementById('auth-switch-prompt');
+  if (switchPrompt) {
+    if (isReg) {
+      switchPrompt.innerHTML = `Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color: var(--primary-green); font-weight: 700; text-decoration: none;">Login here</a>`;
+    } else {
+      switchPrompt.innerHTML = `Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('signup')" style="color: var(--primary-green); font-weight: 700; text-decoration: none;">Create here</a>`;
+    }
+  }
+
+  const subtitle = document.getElementById('auth-subtitle');
+  if (subtitle) {
+    subtitle.innerText = isReg ? "New Member Registration & Application" : "Savings & Credit Cooperative Access";
+  }
 
   lucide.createIcons();
 }
@@ -208,15 +217,59 @@ function renderMemberPortal() {
   memberState.profile = member;
   memberState.transactions = member.transactions || [];
 
+  // Dynamic overdue assessment based on system date vs loan due date
+  const overdueInfo = CoopStore.checkMemberLoanOverdue(member);
+
   // Update Dashboard Overview
   document.getElementById('user-display-name').innerText = member.name;
   document.getElementById('user-display-acc').innerText = member.accountNumber;
   document.getElementById('user-display-balance').innerText = formatPeso(member.savingsBalance);
   document.getElementById('user-loan-balance').innerText = formatPeso(member.activeLoanBalance);
-  document.getElementById('user-monthly-due').innerText = formatPeso(member.monthlyDue);
+
+  // Due date & Overdue penalty indicators on dashboard
+  const loanDueSub = document.getElementById('user-loan-due-sub');
+  if (loanDueSub) {
+    if (member.activeLoanBalance > 0) {
+      if (overdueInfo.isOverdue) {
+        loanDueSub.innerHTML = `<strong style="color:var(--crimson);">Due: ${overdueInfo.dueDate} (Past Due ${overdueInfo.daysOverdue}d)</strong>`;
+      } else {
+        loanDueSub.innerText = `Due date: ${overdueInfo.dueDate || 'Current'}`;
+      }
+    } else {
+      loanDueSub.innerText = 'No active loan';
+    }
+  }
+
+  const monthlyDueEl = document.getElementById('user-monthly-due');
+  const monthlyDueSub = document.getElementById('user-monthly-due-sub');
+  if (monthlyDueEl) {
+    if (overdueInfo.isOverdue) {
+      monthlyDueEl.innerText = formatPeso(overdueInfo.totalDue);
+      monthlyDueEl.style.color = 'var(--crimson)';
+      if (monthlyDueSub) monthlyDueSub.innerHTML = `<span style="color:var(--crimson);">Includes ${formatPeso(overdueInfo.penalty)} late penalty</span>`;
+    } else {
+      monthlyDueEl.innerText = formatPeso(member.monthlyDue);
+      monthlyDueEl.style.color = 'inherit';
+      if (monthlyDueSub) monthlyDueSub.innerText = 'Principal + Interest';
+    }
+  }
+
+  // Dashboard Overdue Alert Banner
+  const dashOverdueAlert = document.getElementById('dash-overdue-alert');
+  const dashOverdueMsg = document.getElementById('dash-overdue-msg');
+  if (dashOverdueAlert) {
+    if (overdueInfo.isOverdue) {
+      dashOverdueAlert.style.display = 'block';
+      if (dashOverdueMsg) {
+        dashOverdueMsg.innerText = `Your monthly loan amortization due on ${overdueInfo.dueDate} is past due by ${overdueInfo.daysOverdue} day(s). Pursuant to cooperative bylaws, a 5% late penalty surcharge (${formatPeso(overdueInfo.penalty)}) has been assessed. Total payable: ${formatPeso(overdueInfo.totalDue)}.`;
+      }
+    } else {
+      dashOverdueAlert.style.display = 'none';
+    }
+  }
 
   const standingEl = document.getElementById('user-credit-standing');
-  if (standingEl) standingEl.innerText = member.creditTier || "Tier A (Prime)";
+  if (standingEl) standingEl.innerText = member.creditTier || "Tier C (Sub Standard)";
   const accStandingEl = document.getElementById('user-account-standing');
   if (accStandingEl) {
     const st = (member.status || 'ACTIVE').toUpperCase();
@@ -288,6 +341,45 @@ function renderMemberPortal() {
   const repayMonthlyDue = document.getElementById('repay-monthly-due');
   if (repayMonthlyDue) repayMonthlyDue.innerText = formatPeso(member.monthlyDue);
 
+  const repayDueDate = document.getElementById('repay-due-date');
+  if (repayDueDate) repayDueDate.innerText = overdueInfo.dueDate || 'N/A';
+
+  const repayPenaltyRow = document.getElementById('repay-penalty-row');
+  const repayPenaltyVal = document.getElementById('repay-penalty-val');
+  const repayTotalPayable = document.getElementById('repay-total-payable');
+  const repayAmtInput = document.getElementById('repay-amount');
+
+  if (repayPenaltyRow && repayTotalPayable) {
+    if (overdueInfo.isOverdue) {
+      repayPenaltyRow.style.display = 'flex';
+      if (repayPenaltyVal) repayPenaltyVal.innerText = `+${formatPeso(overdueInfo.penalty)}`;
+      repayTotalPayable.innerText = formatPeso(overdueInfo.totalDue);
+      repayTotalPayable.style.color = 'var(--crimson)';
+      if (repayAmtInput && (!repayAmtInput.value || Number(repayAmtInput.value) === Number(member.monthlyDue))) {
+        repayAmtInput.value = overdueInfo.totalDue;
+      }
+    } else {
+      repayPenaltyRow.style.display = 'none';
+      repayTotalPayable.innerText = formatPeso(member.monthlyDue);
+      repayTotalPayable.style.color = 'var(--dark-green)';
+      if (repayAmtInput && (!repayAmtInput.value || Number(repayAmtInput.value) === Number(overdueInfo.totalDue))) {
+        repayAmtInput.value = member.monthlyDue > 0 ? member.monthlyDue : '';
+      }
+    }
+  }
+
+  // Update Apply Loan Tier Cap
+  const applyTierName = document.getElementById('apply-tier-name');
+  const applyTierLimit = document.getElementById('apply-tier-limit');
+  if (applyTierName && applyTierLimit) {
+    const tier = member.creditTier || "Tier C (Sub Standard)";
+    applyTierName.innerText = tier;
+    let cap = "₱50,000.00";
+    if (tier.includes("Tier A")) cap = "₱150,000.00";
+    else if (tier.includes("Tier B")) cap = "₱100,000.00";
+    applyTierLimit.innerText = `Eligible Borrowing Cap: ${cap}`;
+  }
+
   // Update Apply Loan Page Pre-Check Alert
   const savingsBalEl = document.getElementById('userSavingsBal');
   if (savingsBalEl) savingsBalEl.innerText = formatPeso(member.savingsBalance);
@@ -329,13 +421,13 @@ function renderMemberPortal() {
 
 function renderProfilePage(member) {
   const tierBadge = document.getElementById('prof-tier-badge');
-  if (tierBadge) tierBadge.innerText = member.creditTier || "Tier A (Prime Member)";
+  if (tierBadge) tierBadge.innerText = member.creditTier || "Tier C (Sub Standard)";
 
   const tierLimit = document.getElementById('prof-tier-limit');
   if (tierLimit) {
-    let max = "₱150,000";
-    if (member.creditTier && member.creditTier.includes("Tier B")) max = "₱100,000";
-    else if (member.creditTier && member.creditTier.includes("Tier C")) max = "₱50,000";
+    let max = "₱50,000";
+    if (member.creditTier && member.creditTier.includes("Tier A")) max = "₱150,000";
+    else if (member.creditTier && member.creditTier.includes("Tier B")) max = "₱100,000";
     tierLimit.innerText = `Max Credit: ${max}`;
   }
 
@@ -562,7 +654,11 @@ function handleLoanRepayment(e) {
     return;
   }
 
-  alert(`Loan repayment ${result.ref} processed!\nPayment of ${formatPeso(amt)} acknowledged.\nRemaining loan balance: ${formatPeso(result.member.activeLoanBalance)}`);
+  const msg = result.penaltyPaid > 0
+    ? `Loan repayment ${result.ref} processed!\n\nPayment of ${formatPeso(amt)} acknowledged:\n• Late Penalty Fee Settled: ${formatPeso(result.penaltyPaid)}\n• Principal Repaid: ${formatPeso(amt - result.penaltyPaid)}\n\nRemaining loan balance: ${formatPeso(result.member.activeLoanBalance)}\nNext Due Date: ${result.member.loanDueDate || 'None (Fully Settled)'}`
+    : `Loan repayment ${result.ref} processed!\n\nPayment of ${formatPeso(amt)} acknowledged.\nRemaining loan balance: ${formatPeso(result.member.activeLoanBalance)}\nNext Due Date: ${result.member.loanDueDate || 'None (Fully Settled)'}`;
+
+  alert(msg);
 
   if (amtInput) amtInput.value = "";
   renderMemberPortal();
@@ -606,8 +702,25 @@ function handleLoanApplication(e) {
     return;
   }
 
+  const amtInput = document.getElementById('apply-amount');
+  const amt = parseFloat(amtInput ? amtInput.value : 0) || 0;
+  const tier = member.creditTier || "Tier C (Sub Standard)";
+
+  // 2. Member credit tier borrowing limit verification
+  if (tier.includes("Tier A") && amt > 150000) {
+    alert("Loan Application Error: As a Tier A (Prime) member, your maximum loan application limit is ₱150,000.00.");
+    return;
+  }
+  else if (tier.includes("Tier B") && amt > 100000) {
+    alert("Loan Application Error: As a Tier B (Standard) member, your maximum loan application limit is ₱100,000.00.");
+    return;
+  }
+  else if (amt > 50000) {
+    alert("Loan Application Error: As a Tier C (Sub Standard) member, your maximum loan application limit is ₱50,000.00.");
+    return;
+  }
+
   const type = document.getElementById('apply-type').value;
-  const amt = parseFloat(document.getElementById('apply-amount').value) || 0;
   const term = parseInt(document.getElementById('apply-term').value) || 12;
   const purpose = (document.getElementById('apply-purpose').value || "").trim();
   const termsAgree = document.getElementById('terms-agree').checked;

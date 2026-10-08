@@ -21,14 +21,7 @@
           <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
         </div>
         <h2 style="color: var(--dark-green); font-size: 22px; font-weight: 800;">CoopCore Member Portal</h2>
-        <p style="color: var(--text-muted); font-size: 13px;">Savings & Credit Cooperative Access</p>
-      </div>
-
-      <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-        <button id="auth-login-tab" class="btn btn-primary" style="flex: 1; justify-content: center;"
-          onclick="toggleAuthMode('login')">Sign In</button>
-        <button id="auth-reg-tab" class="btn btn-outline" style="flex: 1; justify-content: center;"
-          onclick="toggleAuthMode('signup')">Sign Up</button>
+        <p style="color: var(--text-muted); font-size: 13px;" id="auth-subtitle">Savings & Credit Cooperative Access</p>
       </div>
 
       <form id="auth-form" onsubmit="handleAuthSubmit(event)">
@@ -117,6 +110,12 @@
           <i data-lucide="log-in" class="icon"></i> Login
         </button>
 
+        <div id="auth-switch-prompt"
+          style="text-align: center; margin-top: 18px; font-size: 13.5px; color: var(--text-muted);">
+          Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode('signup')"
+            style="color: var(--primary-green); font-weight: 700; text-decoration: none;">Create here</a>
+        </div>
+
       </form>
     </div>
   </div>
@@ -130,7 +129,13 @@
           <i data-lucide="leaf"></i>
           <span>CoopCore</span>
         </div>
-        <span class="brand-badge">Member Portal</span>
+        <div class="brand-actions">
+          <span class="brand-badge">Member Portal</span>
+          <button class="logout-top-btn" onclick="logout()" title="Log Out">
+            <i data-lucide="log-out"></i>
+            <span>Log Out</span>
+          </button>
+        </div>
       </div>
 
       <div class="sidebar-menu">
@@ -204,20 +209,43 @@
           </div>
         </div>
 
+        <!-- Dynamic Overdue & Late Penalty Notice Banner -->
+        <div id="dash-overdue-alert"
+          style="display: none; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;">
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <i data-lucide="alert-triangle"
+              style="color: #DC2626; width: 26px; height: 26px; flex-shrink: 0; margin-top: 2px;"></i>
+            <div style="flex: 1;">
+              <h4 style="color: #991B1B; font-size: 14px; font-weight: 800; margin-bottom: 4px;">⚠️ PAST DUE LOAN
+                AMORTIZATION & LATE PENALTY NOTICE</h4>
+              <p style="font-size: 12.5px; color: #B91C1C; margin-bottom: 8px;" id="dash-overdue-msg">
+                Your loan amortization is past due. A 5% late penalty surcharge has been assessed.
+              </p>
+              <button class="btn btn-primary" onclick="switchView('repayment')"
+                style="background: #DC2626; border-color: #B91C1C; font-size: 12px; padding: 5px 12px;">
+                <i data-lucide="receipt" class="icon"></i> Settle Past Due Amortization Now
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="grid-3">
           <div class="card metric-box">
             <div class="metric-title">Active Loan Balance</div>
             <div class="metric-val" style="color: var(--crimson);" id="user-loan-balance">₱6,183.34</div>
-            <span style="font-size: 12px; color: var(--text-muted);">Due date: Nov 10, 2026</span>
+            <span style="font-size: 12px; color: var(--text-muted);" id="user-loan-due-sub">Due date: Oct 15,
+              2026</span>
           </div>
           <div class="card metric-box">
             <div class="metric-title">Next Installment Due</div>
             <div class="metric-val" id="user-monthly-due">₱883.33</div>
-            <span style="font-size: 12px; color: var(--text-muted);">Principal + Interest</span>
+            <span style="font-size: 12px; color: var(--text-muted);" id="user-monthly-due-sub">Principal +
+              Interest</span>
           </div>
           <div class="card metric-box">
             <div class="metric-title">Credit Standing</div>
-            <div class="metric-val" style="color: var(--primary-green);" id="user-credit-standing">Tier A (Prime)</div>
+            <div class="metric-val" style="color: var(--primary-green);" id="user-credit-standing">Tier C (Sub Standard)
+            </div>
             <span style="font-size: 12px; color: var(--primary-green);" id="user-account-standing">Active</span>
           </div>
         </div>
@@ -351,9 +379,27 @@
               <span style="font-size: 13px; color: var(--text-muted);">Total Outstanding Loan:</span>
               <strong style="color: var(--crimson);" id="userloanBal">₱6,183.34</strong>
             </div>
-            <div style="display: flex; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span style="font-size: 13px; color: var(--text-muted);">Standard Monthly Due:</span>
               <strong style="color: var(--primary-green);" id="repay-monthly-due">₱883.33</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--text-muted);">Amortization Due Date:</span>
+              <strong id="repay-due-date" style="color: var(--text-dark);">October 15, 2026</strong>
+            </div>
+            <!-- Dynamic Late Penalty row (shown when past due date) -->
+            <div id="repay-penalty-row"
+              style="display: none; justify-content: space-between; margin-bottom: 8px; background: #FFF5F5; border: 1px solid #FED7D7; border-radius: 6px; padding: 8px 10px;">
+              <span style="font-size: 13px; color: var(--crimson); font-weight: 700;">Overdue Late Penalty (5%
+                Surcharge):</span>
+              <strong style="color: var(--crimson);" id="repay-penalty-val">₱150.00</strong>
+            </div>
+            <div
+              style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 4px;">
+              <span style="font-size: 13.5px; font-weight: 700; color: var(--text-dark);">Total Amount Payable
+                Now:</span>
+              <strong style="font-size: 16px; font-weight: 800; color: var(--dark-green);"
+                id="repay-total-payable">₱883.33</strong>
             </div>
           </div>
 
@@ -394,6 +440,18 @@
               in verified savings, which exceeds the mandatory <strong>₱6,000.00 minimum qualification
                 threshold</strong>.
             </div>
+          </div>
+
+          <!-- Member Tier Loan Ceiling Badge -->
+          <div id="loan-tier-cap-container"
+            style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 12.5px; color: var(--text-muted);">
+              Credit Rating: <strong id="apply-tier-name" style="color: var(--dark-green);">Tier C (Sub
+                Standard)</strong>
+            </span>
+            <span style="font-size: 12.5px; color: var(--primary-green); font-weight: 700;" id="apply-tier-limit">
+              Eligible Borrowing Cap: ₱50,000.00
+            </span>
           </div>
 
           <form onsubmit="handleLoanApplication(event)">

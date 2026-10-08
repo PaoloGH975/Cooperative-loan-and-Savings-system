@@ -48,9 +48,10 @@ CREATE TABLE IF NOT EXISTS MembersFinanceDatatbl (
     id VARCHAR(20) PRIMARY KEY,
     memberId VARCHAR(20) NOT NULL UNIQUE,
     withdrawableSavings DECIMAL(12, 2) DEFAULT 0.00,
-    creditStanding VARCHAR(50) DEFAULT 'Tier A (Prime)',
+    creditStanding VARCHAR(50) DEFAULT 'Tier C (Sub Standard)',
     loanBalance DECIMAL(12, 2) DEFAULT 0.00,
     monthlyDue DECIMAL(12, 2) DEFAULT 0.00,
+    loanDueDate DATE NULL,
     accountStatus ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') DEFAULT 'ACTIVE',
     lastUpdated DATE NOT NULL,
     FOREIGN KEY (memberId) REFERENCES CoopMemberstbl(id) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -150,10 +151,10 @@ INSERT INTO membershipApplicationtbl (id, fullLegalName, email, contactNumber, a
 ('APP-MEM-002', 'Teresa Gomez', 'teresa.gomez@coopmail.org', '+63 (922) 881-4412', 'Cabuyao City, Laguna', 'Entrepreneur', '30000-39999', FALSE, 3000.00, 'PENDING', 'password123', '2026-10-05');
 
 -- Seed Table 3: MembersFinanceDatatbl
-INSERT INTO MembersFinanceDatatbl (id, memberId, withdrawableSavings, creditStanding, loanBalance, monthlyDue, accountStatus, lastUpdated) VALUES
-('FIN-001', 'MEM-001', 8500.00, 'Tier A (Prime)', 6183.34, 883.33, 'ACTIVE', '2026-10-06'),
-('FIN-002', 'MEM-002', 1200.00, 'Tier C (Sub Standard)', 4100.00, 683.33, 'ACTIVE', '2026-10-06'),
-('FIN-003', 'MEM-003', 15000.00, 'Tier A (Prime)', 0.00, 0.00, 'ACTIVE', '2026-10-06');
+INSERT INTO MembersFinanceDatatbl (id, memberId, withdrawableSavings, creditStanding, loanBalance, monthlyDue, loanDueDate, accountStatus, lastUpdated) VALUES
+('FIN-001', 'MEM-001', 8500.00, 'Tier C (Sub Standard)', 6183.34, 883.33, '2026-10-15', 'ACTIVE', '2026-10-06'),
+('FIN-002', 'MEM-002', 1200.00, 'Tier C (Sub Standard)', 4100.00, 683.33, '2026-10-05', 'ACTIVE', '2026-10-06'),
+('FIN-003', 'MEM-003', 15000.00, 'Tier C (Sub Standard)', 0.00, 0.00, NULL, 'ACTIVE', '2026-10-06');
 
 -- Seed Table 4: MembersDeposit
 INSERT INTO MembersDeposit (id, memberId, depositAmount, depositType, paymentChannel, referenceNumber, dateDeposited) VALUES
@@ -178,5 +179,6 @@ INSERT INTO SavingsWithdrawalstbl (id, memberId, withdrawalAmount, destinationBa
 
 -- Seed Table 8: AdminUserstbl
 INSERT INTO AdminUserstbl (id, adminUsername, adminPassword, fullName, role, dateCreated) VALUES
-('ADM-001', 'admin', 'adminpassword', 'Chief Loan Officer', 'SYSTEM_ADMINISTRATOR', '2026-01-01');
+('ADM-001', 'admin', 'adminpassword', 'Maria Santos (Operations)', 'SYSTEM_ADMINISTRATOR', '2026-01-01'),
+('ADM-002', 'credit', 'creditpassword', 'Eduardo Ramos (Credit Committee)', 'CREDIT_COMMITTEE_OFFICER', '2026-01-01');
 

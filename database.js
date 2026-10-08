@@ -77,7 +77,7 @@
         id: "FIN-001",
         memberId: "MEM-001",
         withdrawableSavings: 8500.00,
-        creditStanding: "Tier A (Prime)",
+        creditStanding: "Tier C (Sub Standard)",
         loanBalance: 6183.34,
         monthlyDue: 883.33,
         accountStatus: "ACTIVE",
@@ -215,9 +215,17 @@
       {
         id: "ADM-001",
         adminUsername: "admin",
-        adminPassword: "adminpassword",
-        fullName: "Chief Loan Officer",
-        role: "SYSTEM_ADMINISTRATOR",
+        adminPassword: "password123",
+        fullName: "Maria Santos",
+        role: "GENERAL_ADMINISTRATOR",
+        dateCreated: "2026-01-01"
+      },
+      {
+        id: "ADM-002",
+        adminUsername: "credit",
+        adminPassword: "password123",
+        fullName: "Eduardo Ramos",
+        role: "CREDIT_COMMITTEE_OFFICER",
         dateCreated: "2026-01-01"
       }
     ]
@@ -332,6 +340,50 @@
         summary[tbl] = (db[tbl] || []).length;
       });
       return summary;
+    },
+
+    // Export current database records as complete SQL INSERT statements
+    exportSQL: function () {
+      const db = loadDatabase();
+      let sql = "-- ========================================================\n";
+      sql += "-- Exported Live Database Records (Cooperative System)\n";
+      sql += "-- Exported At: " + new Date().toLocaleString() + "\n";
+      sql += "-- ========================================================\n\n";
+
+      this.listTables().forEach(tableName => {
+        const rows = db[tableName] || [];
+        if (rows.length === 0) return;
+        sql += `-- --------------------------------------------------------\n`;
+        sql += `-- Table: ${tableName} (${rows.length} records)\n`;
+        sql += `-- --------------------------------------------------------\n`;
+        rows.forEach(row => {
+          const cols = Object.keys(row).join(", ");
+          const vals = Object.values(row).map(v => {
+            if (typeof v === "number") return v;
+            if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
+            if (v === null || v === undefined) return "NULL";
+            return "'" + String(v).replace(/'/g, "''") + "'";
+          }).join(", ");
+          sql += `INSERT INTO ${tableName} (${cols}) VALUES (${vals});\n`;
+        });
+        sql += "\n";
+      });
+      return sql;
+    },
+
+    // Download current SQL script directly to a file from the browser
+    downloadSQL: function () {
+      const content = this.exportSQL();
+      if (typeof document === "undefined") return content;
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "coop_database_updated.sql";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      console.log("Database exported and downloaded as coop_database_updated.sql");
+      return "coop_database_updated.sql downloaded successfully!";
     }
   };
 
