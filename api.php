@@ -46,7 +46,14 @@ switch ($action) {
     // ----------------------------------------------------
     case 'apply_membership':
         $id = $input['id'] ?? ('APP-MEM-' . rand(100, 999));
-        $fullLegalName = trim($input['fullLegalName'] ?? ($input['name'] ?? 'New Member'));
+        $fullLegalName = trim($input['fullLegalName'] ?? ($input['name'] ?? ''));
+        if (!$fullLegalName) {
+            $parts = array_filter([$input['firstName'] ?? '', $input['middleName'] ?? '', $input['lastName'] ?? '']);
+            $fullLegalName = trim(implode(' ', $parts));
+        }
+        if (!$fullLegalName) {
+            $fullLegalName = 'New Member';
+        }
         $email = trim($input['email'] ?? '');
         $contactNumber = trim($input['contactNumber'] ?? ($input['phone'] ?? ''));
         $address = trim($input['address'] ?? 'Calamba City, Laguna');

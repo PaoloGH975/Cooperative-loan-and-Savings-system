@@ -65,9 +65,15 @@ function handleAuthSubmit(e) {
 
   if (isSignUp) {
     // 1. REGISTRATION WORKFLOW
-    const firstName = (document.getElementById('auth-first-name').value || "").trim();
-    const middleName = (document.getElementById('auth-middle-name').value || "").trim();
-    const lastName = (document.getElementById('auth-last-name').value || "").trim();
+    const fullNameInput = document.getElementById('auth-full-name');
+    const fullLegalName = fullNameInput ? fullNameInput.value.trim() : "";
+
+    // Auto-parse parts for backwards-compatible object structures
+    const nameParts = fullLegalName.split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || "";
+    const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
+    const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+
     const birthday = document.getElementById('auth-birthday').value;
     const placeOfBirth = (document.getElementById('auth-place-birth').value || "").trim();
     const address = (document.getElementById('auth-address').value || "").trim();
@@ -76,8 +82,8 @@ function handleAuthSubmit(e) {
     const nationality = (document.getElementById('auth-nationality').value || "Filipino").trim();
     const income = document.getElementById('auth-income').value;
 
-    if (!firstName || !lastName || !email || !password) {
-      alert("Please complete required registration fields (First Name, Last Name, Email, and Password).");
+    if (!fullLegalName || !email || !password) {
+      alert("Please complete required registration fields (Full Legal Name, Email, and Password).");
       return;
     }
 
@@ -101,6 +107,8 @@ function handleAuthSubmit(e) {
 
     // Create pending approval
     CoopStore.createPendingApproval({
+      name: fullLegalName,
+      fullLegalName: fullLegalName,
       firstName,
       middleName,
       lastName,
@@ -120,9 +128,7 @@ function handleAuthSubmit(e) {
     alert("Registration submitted successfully!\nYour application has been forwarded to the cooperative administration for qualification review and PMES verification.\nOnce approved by the cooperative officer, you can log in to your account.");
 
     // Reset registration form fields and switch to login
-    document.getElementById('auth-first-name').value = "";
-    document.getElementById('auth-middle-name').value = "";
-    document.getElementById('auth-last-name').value = "";
+    if (fullNameInput) fullNameInput.value = "";
     document.getElementById('auth-birthday').value = "";
     document.getElementById('auth-place-birth').value = "";
     document.getElementById('auth-address').value = "";

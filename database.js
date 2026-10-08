@@ -215,6 +215,7 @@
       {
         id: "ADM-001",
         adminUsername: "admin",
+        email: "admin@coopcore.ph",
         adminPassword: "password123",
         fullName: "Maria Santos",
         role: "GENERAL_ADMINISTRATOR",
@@ -223,6 +224,7 @@
       {
         id: "ADM-002",
         adminUsername: "credit",
+        email: "credit@coopcore.ph",
         adminPassword: "password123",
         fullName: "Eduardo Ramos",
         role: "CREDIT_COMMITTEE_OFFICER",

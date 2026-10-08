@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS SavingsWithdrawalstbl (
 CREATE TABLE IF NOT EXISTS AdminUserstbl (
     id VARCHAR(20) PRIMARY KEY,
     adminUsername VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     adminPassword VARCHAR(255) NOT NULL,
     fullName VARCHAR(100) NOT NULL,
     role VARCHAR(50) DEFAULT 'SYSTEM_ADMINISTRATOR',
@@ -178,7 +179,8 @@ INSERT INTO SavingsWithdrawalstbl (id, memberId, withdrawalAmount, destinationBa
 ('WDL-5001', 'MEM-001', 1500.00, 'BDO', '1092-4819-22', 'Elena Rostova', 15.00, '2026-09-20 03:15 PM', 'TX-BNK-99120');
 
 -- Seed Table 8: AdminUserstbl
-INSERT INTO AdminUserstbl (id, adminUsername, adminPassword, fullName, role, dateCreated) VALUES
-('ADM-001', 'admin', 'adminpassword', 'Maria Santos (Operations)', 'SYSTEM_ADMINISTRATOR', '2026-01-01'),
-('ADM-002', 'credit', 'creditpassword', 'Eduardo Ramos (Credit Committee)', 'CREDIT_COMMITTEE_OFFICER', '2026-01-01');
+INSERT INTO AdminUserstbl (id, adminUsername, email, adminPassword, fullName, role, dateCreated) VALUES
+('ADM-001', 'admin', 'admin@coopcore.ph', 'adminpassword', 'Maria Santos (Operations)', 'SYSTEM_ADMINISTRATOR', '2026-01-01'),
+('ADM-002', 'credit', 'credit@coopcore.ph', 'creditpassword', 'Eduardo Ramos (Credit Committee)', 'CREDIT_COMMITTEE_OFFICER', '2026-01-01');
+
 

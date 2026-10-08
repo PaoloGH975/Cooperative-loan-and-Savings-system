@@ -69,6 +69,8 @@ function renderAdminStaffHeader() {
   const staff = CoopStore.getActiveStaff();
   const select = document.getElementById('admin-staff-select');
   if (select) select.value = staff.id;
+  const emailBadge = document.getElementById('admin-staff-email-badge');
+  if (emailBadge && staff.email) emailBadge.innerText = staff.email;
   updateDateSimulationLabel();
 }
 

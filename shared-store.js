@@ -308,29 +308,72 @@
   }
 
   // Live phpMyAdmin / MySQL Synchronizer
+  let activeApiEndpoint = null;
+
   function sendToApi(action, payload) {
     try {
       if (typeof window === "undefined" || !window.fetch) return;
-      const isHttp = window.location.protocol.startsWith('http');
-      const endpoint = isHttp
-        ? 'api.php?action=' + action
-        : 'http://localhost/Cooperative-loan-and-Savings-system/api.php?action=' + action;
 
-      fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.success) {
-            console.log(`%c[phpMyAdmin MySQL Synchronized] ${data.message}`, 'color: #059669; font-weight: bold;');
-          }
+      const endpoints = [];
+      if (activeApiEndpoint) {
+        endpoints.push(activeApiEndpoint);
+      }
+
+      const isHttp = window.location.protocol.startsWith('http');
+      if (isHttp) {
+        endpoints.push('api.php');
+      }
+
+      if (typeof window !== "undefined" && window.location) {
+        const segments = window.location.pathname.split('/').filter(Boolean);
+        if (segments.length > 0 && segments[0].toLowerCase().includes('coop')) {
+          endpoints.push('/' + segments[0] + '/api.php');
+        }
+      }
+
+      endpoints.push('http://localhost/Cooperative-loan-and-Savings-system/api.php');
+      endpoints.push('http://localhost/Cooperative-loan-and-Savings-system-main/api.php');
+      endpoints.push('http://localhost/cooperative-loan-and-savings-system/api.php');
+      endpoints.push('http://localhost/api.php');
+
+      const uniqueEndpoints = [...new Set(endpoints)];
+
+      function trySend(index) {
+        if (index >= uniqueEndpoints.length) {
+          console.warn('[phpMyAdmin Sync Notice] Unable to connect to MySQL backend via XAMPP. Ensure Apache and MySQL are running in XAMPP and the folder is in htdocs.');
+          return;
+        }
+
+        const base = uniqueEndpoints[index];
+        const url = base.includes('?') ? (base + '&action=' + action) : (base + '?action=' + action);
+
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         })
-        .catch(() => {
-          // Fallback silently if XAMPP MySQL is not started
-        });
-    } catch (e) { }
+          .then(async (res) => {
+            if (!res.ok) {
+              trySend(index + 1);
+              return;
+            }
+            const data = await res.json();
+            if (data && data.success) {
+              activeApiEndpoint = base;
+              console.log(`%c[phpMyAdmin MySQL Synchronized] ${data.message}`, 'color: #059669; font-weight: bold;');
+            } else {
+              console.warn('[phpMyAdmin MySQL Response Warning]', data);
+            }
+          })
+          .catch(() => {
+            trySend(index + 1);
+          });
+      }
+
+      trySend(0);
+    } catch (e) {
+      console.warn("sendToApi error:", e);
+    }
   }
 
   const STAFF_ACCOUNTS = {
@@ -635,12 +678,15 @@
       const nextNum = state.pendingApprovals.length + state.members.length + 1;
       const id = "APP-MEM-" + String(nextNum).padStart(3, "0");
 
+      const resolvedName = applicant.fullLegalName || applicant.name || `${applicant.firstName || ''} ${applicant.lastName || ''}`.trim() || "New Applicant";
+
       const newApp = {
         id: id,
-        name: `${applicant.firstName || ''} ${applicant.lastName || ''}`.trim() || applicant.name || "New Applicant",
-        firstName: applicant.firstName || "",
+        name: resolvedName,
+        fullLegalName: resolvedName,
+        firstName: applicant.firstName || resolvedName.split(" ")[0] || "",
         middleName: applicant.middleName || "",
-        lastName: applicant.lastName || "",
+        lastName: applicant.lastName || resolvedName.split(" ").slice(1).join(" ") || "",
         phone: applicant.phone || "+63 (900) 000-0000",
         email: applicant.email || "",
         employment: applicant.occupation || applicant.employment || "Self-Employed",
@@ -663,7 +709,11 @@
       // Record live into phpMyAdmin (membershipApplicationtbl)
       sendToApi('apply_membership', {
         id: id,
-        fullLegalName: newApp.name,
+        fullLegalName: resolvedName,
+        name: resolvedName,
+        firstName: newApp.firstName,
+        middleName: newApp.middleName,
+        lastName: newApp.lastName,
         email: newApp.email,
         contactNumber: newApp.phone,
         address: newApp.address,
